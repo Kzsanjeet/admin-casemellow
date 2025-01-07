@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from "@/components/ui/input"
 import { useRouter } from 'next/navigation'
-import { Plus, Search, Edit2, Trash2, MoreVertical } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, MoreVertical, Eye } from 'lucide-react'
 import { Switch } from '../ui/switch'
 import { Label } from '../ui/label'
 
@@ -92,12 +92,12 @@ const ProductTable = () => {
     const totalValue = filteredProducts.reduce((sum, product) => sum + (product.price * product.stock), 0)
 
     return (
-        <div className="p-8 flex w-full items-center justify-center bg-gray-200 min-h-full">
+        <div className="p-8 flex w-full items-center justify-center bg-gray-100 min-h-full">
             <div className="w-11/12 h-screen mx-auto space-y-6">
                 {/* Header Section */}
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Products</h1>
+                        <h1 className="text-3xl font-bold text-gray-900">Products</h1>
                         <p className="text-gray-500 mt-1">Manage your product inventory</p>
                     </div>
                     <Button 
@@ -132,7 +132,7 @@ const ProductTable = () => {
                                 <TableHead className='font-semibold'>Price</TableHead>
                                 {/* <TableHead>Stock</TableHead>
                                 <TableHead>Status</TableHead> */}
-                                <TableHead className='font-semibold'>Popular</TableHead>
+                                <TableHead className='font-semibold'>Activate</TableHead>
                                 <TableHead className="text-right font-semibold">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -145,7 +145,7 @@ const ProductTable = () => {
                                             alt={product.name}
                                             className="h-10 w-10 rounded-lg object-cover"
                                         />
-                                        <span className="font-medium">{product.name}</span>
+                                        <span className="font-medium text-gray-700">{product.name}</span>
                                     </TableCell>
                                     <TableCell>{product.brand}</TableCell>
                                     <TableCell>Rs <span className='text-xl text-gray-700'>{product.price.toFixed(2)}</span></TableCell>
@@ -159,13 +159,20 @@ const ProductTable = () => {
                                         <span className="">
                                             <div className="flex items-center space-x-2">
                                                 <Switch id="feature" />
-                                                <Label htmlFor="airplane-mode">Popular</Label>
+                                                <Label htmlFor="airplane-mode" className='text-xl text-gray-700'>Activate</Label>
                                             </div>
                                         </span>
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end space-x-2">
-                                            <Button variant="ghost" size="sm" className='text-blue-600 hover:bg-blue-100 hover:text-blue-700'>
+                                        <Button 
+                                                variant="ghost" 
+                                                size="sm" 
+                                                className="hover:bg-blue-100 text-blue-600 hover:text-blue-700 p-2 h-8 w-8"
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
+                                            <Button variant="ghost" size="sm" className='text-green-600 hover:bg-green-100 hover:text-green-700'>
                                                 <Edit2 className="h-4 w-4" />
                                             </Button>
                                             <Button variant="ghost" size="sm" className="text-red-600 hover:bg-red-100 hover:text-red-700">
