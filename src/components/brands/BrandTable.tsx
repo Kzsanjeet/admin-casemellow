@@ -168,6 +168,7 @@ const BrandTable = () => {
                             <Button
                                 variant="ghost"
                                 size="sm"
+                                onClick={() => router.push(`/brands/${brand._id}`)}
                                 className="hover:bg-green-100 text-green-600 hover:text-green-600 p-2 h-8 w-8"
                             >
                                 <Edit2 className="h-4 w-4" />

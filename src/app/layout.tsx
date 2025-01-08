@@ -6,6 +6,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Toaster } from "sonner";
 import { usePathname } from "next/navigation";
 import { AppSidebar } from "@/components/ui/app-sidebar";
+import LoginContext, { LoginUserContext } from "@/provider/LoginContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,21 +41,23 @@ return (
     <body
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
-       <SidebarProvider>
-         {!isLoginPage &&
-            !isForgotPasswordPage &&
-            !startPage &&
-            !isVerifyPage &&
-            !isChangePasswordPage && (
-                <>
-                <AppSidebar />
-                <SidebarTrigger />
-                </>
-                )}
-      
-        <Toaster position="top-center" />
-          {children}
-      </SidebarProvider>
+      <LoginContext>
+        <SidebarProvider>
+          {!isLoginPage &&
+              !isForgotPasswordPage &&
+              !startPage &&
+              !isVerifyPage &&
+              !isChangePasswordPage && (
+                  <>
+                  <AppSidebar />
+                  <SidebarTrigger />
+                  </>
+                  )}
+        
+          <Toaster position="top-center" />
+            {children}
+        </SidebarProvider>
+      </LoginContext>
     </body>
   </html>
 );

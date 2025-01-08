@@ -1,11 +1,14 @@
 "use client"
-import React, { FormEvent, useState } from 'react'
+import React, { FormEvent, useContext, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
 import Loader from '@/components/loading/loader'
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
+import { LoginUserContext } from '@/provider/LoginContext'
+import Cookies from "js-cookie"
+
 
 const Login = () => {
     const [email, setEmail] = useState("")
@@ -13,36 +16,38 @@ const Login = () => {
     const [loading, setLoading] = useState(false)
     const router = useRouter()
     const [showPassword, setShowPassword] = useState(false)
+    const {isLoggedIn,setIsLoggedIn} = useContext(LoginUserContext)!
 
     const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault()
-        setLoading(true)
-
+        e.preventDefault();
+        setLoading(true);
+    
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_LOCAL_PORT}/login`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
-                credentials: "include",
-            })
-
-            const data = await response.json()
-
+                credentials: "include", // Ensure cookies are sent with the request
+            });
+    
+            const data = await response.json();
+    
             if (response.ok) {
-                toast.success("Login successful")
-                router.push("/home")
+                toast.success("Login successful");
+                setIsLoggedIn(true);
+                router.push("/home");
             } else {
-                toast.error(data.error || "Login failed.")
+                toast.error(data.error || "Login failed.");
+                setIsLoggedIn(false);
             }
         } catch (error) {
-            console.error("Error:", error)
-            toast.error("An unexpected error occurred. Please try again.")
+            console.error("Error:", error);
+            toast.error("An unexpected error occurred. Please try again.");
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
+    
 
     if (loading) return <Loader />
   return (
