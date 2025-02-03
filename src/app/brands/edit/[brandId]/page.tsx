@@ -4,16 +4,16 @@ import Loader from "@/components/loading/loader";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-interface PhoneModel {
-  modelName: string;
-  coverTypes: string[];
-  _id?: string;
-}
+// interface PhoneModel {
+//   modelName: string;
+//   coverTypes: string[];
+//   _id?: string;
+// }
 
 interface Brand {
   _id: string;
   brandName: string;
-  phoneModels: PhoneModel[];
+  // phoneModels: PhoneModel[];
   isActive: boolean;
 }
 
@@ -63,8 +63,8 @@ const Page = () => {
     <div className="w-full">
       <EditBrand
         brandName={brandData.brandName}
-        modelName={brandData.phoneModels[0].modelName}
-        coverTypes={brandData.phoneModels[0].coverTypes}
+        // modelName={brandData.phoneModels[0].modelName}
+        // coverTypes={brandData.phoneModels[0].coverTypes}
         brandId={brandData._id}
         isActive={brandData.isActive}
       />

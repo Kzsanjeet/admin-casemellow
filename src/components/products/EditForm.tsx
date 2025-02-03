@@ -16,31 +16,39 @@ interface Brand {
   brandName: string;
 }
 
-interface ProductFormData {
-  productName: string;
-  productPrice: number;
-  productDescription: string;
-  productImage: File | null;
-  productCategory: string;
-  brands: string; // Changed from Brand[] to string
-  phoneModel: string;
-  coverTypes: string[];
-}
+interface ProductProps {
+    productDetails: {
+      _id: string;
+      productName: string;
+      productPrice: number;
+      productDescription: string;
+      productImage: string; // Should be string here
+      productCategory: string;
+      brands: {
+        _id: string;
+        brandName: string;
+      };
+      phoneModel: string;
+      coverType: string[];
+    };
+  }
 
-const ProductForm = () => {
+
+const EditForm: React.FC<ProductProps> = ({ productDetails }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [brands, setBrands] = useState<Brand[]>([]);
-  
-  const [formData, setFormData] = useState<ProductFormData>({
-    productName: "",
-    productPrice: 0,
-    productDescription: "",
-    productImage: null,
-    productCategory: "",
-    brands: "", // Changed to string
-    phoneModel: "",
-    coverTypes: [],
+  const [newImage, setNewImage] = useState<File | null>(null); // Track new image file
+  const [existingImage, setExistingImage] = useState(productDetails.productImage || ''); // Existing image URL
+
+  const [formData, setFormData] = useState({
+    productName: productDetails.productName || '',
+    productPrice: productDetails.productPrice || 0,
+    productDescription: productDetails.productDescription || '',
+    productCategory: productDetails.productCategory || '',
+    brands: productDetails.brands._id || '',
+    phoneModel: productDetails.phoneModel || '',
+    coverType: productDetails.coverType || [],
   });
 
   const coverTypes = [
@@ -62,7 +70,7 @@ const ProductForm = () => {
       'price': 'productPrice',
       'description': 'productDescription',
       'category': 'productCategory',
-      'brand': 'brands', // Updated to match new field name
+      'brand': 'brands',
       'modelName': 'phoneModel',
     };
 
@@ -75,45 +83,32 @@ const ProductForm = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFormData((prev) => ({
-        ...prev,
-        productImage: e.target.files![0],
-      }));
+      setNewImage(e.target.files[0]); // Set new image file
     }
   };
 
   const handleCoverTypeChange = (type: string) => {
-    setFormData(prev => {
-      const updatedCoverTypes = prev.coverTypes.includes(type)
-        ? prev.coverTypes.filter(t => t !== type)
-        : [...prev.coverTypes, type];
-
-      return {
-        ...prev,
-        coverTypes: updatedCoverTypes
-      };
-    });
+    setFormData(prev => ({
+      ...prev,
+      coverType: prev.coverType.includes(type)
+        ? prev.coverType.filter(t => t !== type)
+        : [...prev.coverType, type]
+    }));
   };
 
   const handleSelectAllCoverTypes = () => {
     setFormData(prev => ({
       ...prev,
-      coverTypes: prev.coverTypes.length === coverTypes.length ? [] : [...coverTypes]
+      coverType: prev.coverType.length === coverTypes.length ? [] : [...coverTypes]
     }));
   };
 
   const fetchBrands = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_LOCAL_PORT}/brands/get`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(`${process.env.NEXT_PUBLIC_LOCAL_PORT}/brands/get`);
       const data = await response.json();
       setBrands(data.data);
     } catch (error) {
-      console.error('Error fetching brands:', error);
       toast.error('Failed to fetch brands');
     }
   };
@@ -123,36 +118,34 @@ const ProductForm = () => {
     setLoading(true);
     
     try {
-      // Create FormData object for multipart/form-data
       const formDataToSend = new FormData();
-      
-      // Append all form fields
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === 'productImage' && value instanceof File) {
-          formDataToSend.append('productImage', value);
-        } else if (key === 'coverTypes') {
-          formDataToSend.append('coverTypes', JSON.stringify(value));
-        } else {
-          formDataToSend.append(key, String(value));
-        }
-      });
+      formDataToSend.append('productName', formData.productName);
+      formDataToSend.append('productPrice', String(formData.productPrice));
+      formDataToSend.append('productDescription', formData.productDescription);
+      formDataToSend.append('productCategory', formData.productCategory);
+      formDataToSend.append('brands', formData.brands);
+      formDataToSend.append('phoneModel', formData.phoneModel);
+      formDataToSend.append('coverType', JSON.stringify(formData.coverType));
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_LOCAL_PORT}/products/add-product`, {
-        method: 'POST',
-        body: formDataToSend, // Send as FormData instead of JSON
+      if (newImage) {
+        formDataToSend.append('productImage', newImage); // Append new image if exists
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_LOCAL_PORT}/products/edit-product/${productDetails._id}`, {
+        method: 'PATCH',
+        body: formDataToSend,
       });
 
       const data = await response.json();
       
       if (response.ok) {
-        toast.success("Product added successfully");
+        toast.success("Product updated successfully");
         router.push('/products');
       } else {
-        toast.error(data.message || "Failed to add product");
+        toast.error(data.message || "Failed to update product");
       }
     } catch (error) {
-      console.error(error);
-      toast.error("An error occurred while adding the product");
+      toast.error("An error occurred while updating the product");
     } finally {
       setLoading(false);
     }
@@ -164,7 +157,7 @@ const ProductForm = () => {
         <CardHeader className="space-y-1">
           <div className="flex justify-between items-center">
             <CardTitle className="text-2xl font-bold text-gray-800">
-              Add New Product
+              Edit Product
             </CardTitle>
             <Button
               onClick={() => router.push(`/products`)}
@@ -176,7 +169,7 @@ const ProductForm = () => {
             </Button>
           </div>
           <p className="text-sm text-gray-500">
-            Enter the details for the new product
+            Update the product details
           </p>
         </CardHeader>
         <CardContent>
@@ -281,13 +274,22 @@ const ProductForm = () => {
                     accept="image/*"
                     className="hidden" 
                     onChange={handleFileChange}
-                    required
                   />
                 </label>
               </div>
-              {formData.productImage && (
-                <p className="text-sm text-gray-500 font-bold mt-2">
-                  Selected file: {formData.productImage.name}
+              {existingImage && (
+                <div className="mt-2">
+                  <p className="text-sm text-gray-600">Current Image:</p>
+                  <img 
+                    src={existingImage} 
+                    alt="Current product" 
+                    className="h-20 w-20 object-cover rounded" 
+                  />
+                </div>
+              )}
+              {newImage && (
+                <p className="text-sm text-gray-500 font-semibold mt-2">
+                  New selected file: {newImage.name}
                 </p>
               )}
             </div>
@@ -342,7 +344,7 @@ const ProductForm = () => {
               </select>
             </div>
 
-            {/* model Name */}
+            {/* Model Name */}
             <div className="space-y-2">
               <label
                 htmlFor="modelName"
@@ -369,13 +371,13 @@ const ProductForm = () => {
                   Cover Types Available
                 </label>
                 <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSelectAllCoverTypes}
-                  className="text-xs px-2 py-1 h-7"
-                >
-                  {formData.coverTypes.length === coverTypes.length ? 'Unselect All' : 'Select All'}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSelectAllCoverTypes}
+                    className="text-xs px-2 py-1 h-7"
+                    >
+                    {formData.coverType.length === coverTypes.length ? 'Unselect All' : 'Select All'}
                 </Button>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -383,14 +385,14 @@ const ProductForm = () => {
                   <label
                     key={type}
                     className={`flex items-center space-x-2 p-3 border rounded-lg cursor-pointer transition-colors ${
-                      formData.coverTypes.includes(type) 
+                      formData.coverType.includes(type) 
                         ? 'bg-blue-100 border-gray-400' 
                         : 'hover:bg-gray-50'
                     }`}
                   >
                     <input
                       type="checkbox"
-                      checked={formData.coverTypes.includes(type)}
+                      checked={formData.coverType.includes(type)}
                       onChange={() => handleCoverTypeChange(type)}
                       className="rounded border-gray-300 text-gray-900 focus:ring-gray-400"
                     />
@@ -407,7 +409,7 @@ const ProductForm = () => {
                 disabled={loading}
                 className="flex-1 bg-black text-white hover:bg-gray-800 rounded-lg py-2 transition-colors"
               >
-                {loading ? 'Saving...' : 'Save Product'}
+                {loading ? 'Updating...' : 'Update Product'}
               </Button>
               <Button
                 type="button"
@@ -426,7 +428,4 @@ const ProductForm = () => {
   );
 };
 
-export default ProductForm;
-
-
-
+export default EditForm;

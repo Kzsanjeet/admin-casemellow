@@ -31,15 +31,22 @@ const Login = () => {
             });
     
             const data = await response.json();
-    
-            if (response.ok) {
-                toast.success("Login successful");
-                setIsLoggedIn(true);
-                router.push("/home");
-            } else {
-                toast.error(data.error || "Login failed.");
-                setIsLoggedIn(false);
-            }
+
+            // if(isLoggedIn === true){
+            //     toast.success("Already logged in.")
+            //     router.push("/home")
+            // }else{
+                if (response.ok) {
+                    toast.success("Login successful");
+                    setIsLoggedIn(true);
+                    router.push("/home");
+                } else {
+                    toast.error(data.error || "Login failed.");
+                    setIsLoggedIn(false);
+                }
+            // }
+            
+            
         } catch (error) {
             console.error("Error:", error);
             toast.error("An unexpected error occurred. Please try again.");

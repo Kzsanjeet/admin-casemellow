@@ -9,34 +9,34 @@ import { toast } from 'sonner';
 
 interface EditBrandProps {
   brandName: string;
-  modelName: string;
-  coverTypes: string[];
+  // modelName: string;
+  // coverTypes: string[];
   brandId: string;
   isActive: boolean;
 }
 
 const EditBrand: React.FC<EditBrandProps> = ({
   brandName,
-  modelName,
-  coverTypes: existingCoverTypes,
+  // modelName,
+  // coverTypes: existingCoverTypes,
   brandId,
   isActive,
 }) => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     
-    // Available cover types
-    const coverTypes = [
-      "Premium Double Layer",
-      "3D hard cover",
-      "2D Cover",
-    ];
+    // // Available cover types
+    // const coverTypes = [
+    //   "Premium Double Layer",
+    //   "3D hard cover",
+    //   "2D Cover",
+    // ];
   
     // Form data state
     const [formData, setFormData] = useState({
       brandName: brandName,
-      modelName: modelName,
-      coverTypes: existingCoverTypes,
+      // modelName: modelName,
+      // coverTypes: existingCoverTypes,
       isActive: isActive
     });
   
@@ -50,51 +50,48 @@ const EditBrand: React.FC<EditBrandProps> = ({
     };
   
     // Handle cover type selection
-    const handleCoverTypeChange = (type: string) => {
-      setFormData(prev => ({
-        ...prev,
-        coverTypes: prev.coverTypes.includes(type)
-          ? prev.coverTypes.filter(t => t !== type)
-          : [...prev.coverTypes, type]
-      }));
-    };
+    // const handleCoverTypeChange = (type: string) => {
+    //   setFormData(prev => ({
+    //     ...prev,
+    //     coverTypes: prev.coverTypes.includes(type)
+    //       ? prev.coverTypes.filter(t => t !== type)
+    //       : [...prev.coverTypes, type]
+    //   }));
+    // };
   
     // Handle select/unselect all cover types
-    const handleSelectAllCoverTypes = () => {
-      setFormData(prev => ({
-        ...prev,
-        coverTypes: prev.coverTypes.length === coverTypes.length ? [] : [...coverTypes]
-      }));
-    };
+    // const handleSelectAllCoverTypes = () => {
+    //   setFormData(prev => ({
+    //     ...prev,
+    //     coverTypes: prev.coverTypes.length === coverTypes.length ? [] : [...coverTypes]
+    //   }));
+    // };
   
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       setLoading(true);
   
-      // Prepare the data structure according to your API requirements
-
-    
       try {
         console.log('Sending update data:', ); // Debug log
   
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_LOCAL_PORT}/edit-brand/${brandId}`,
           {
-            method: 'PATCH', // Changed to PATCH as per your API
+            method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 brandName: formData.brandName,
-                modelName: formData.modelName,
-                coverTypes: formData.coverTypes
+                // modelName: formData.modelName,
+                // coverTypes: formData.coverTypes
             }),
           }
         );
   
         const data = await response.json();
-        console.log('Response:', data); // Debug log
+        // console.log('Response:', data); 
   
         if (!response.ok) {
           throw new Error(data.message || 'Failed to update brand');
@@ -159,7 +156,7 @@ const EditBrand: React.FC<EditBrandProps> = ({
             </div>
 
             {/* Model Name */}
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <label
                 htmlFor="modelName"
                 className="text-sm font-medium text-gray-700"
@@ -176,10 +173,10 @@ const EditBrand: React.FC<EditBrandProps> = ({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all"
                 required
               />
-            </div>
+            </div> */}
 
             {/* Cover Types */}
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <div className="flex justify-between items-center mb-2">
                 <label className="text-sm font-medium text-gray-700">
                   Cover Types Available
@@ -214,7 +211,7 @@ const EditBrand: React.FC<EditBrandProps> = ({
                   </label>
                 ))}
               </div>
-            </div>
+            </div> */}
 
             {/* Actions */}
             <div className="flex gap-4 pt-4">

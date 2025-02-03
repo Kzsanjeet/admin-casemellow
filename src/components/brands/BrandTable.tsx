@@ -26,16 +26,12 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useDebounce } from "@/hooks/use-debounce";
+import DeleteForm from "./DeleteForm";
+import { toast } from "sonner";
 
 interface Brands {
   _id: string;
   brandName: string;
-  phoneModels: [
-    {
-      modelName: string;
-      coverTypes: [string];
-    }
-  ];
   isActive: boolean;
 }
 
@@ -48,7 +44,27 @@ const BrandTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
+  
+  const [isDelete,setIsDelete] =  useState(false)
+  const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
 
+
+ 
+
+  // const handleOpenDeleteModal = (brandId: string) => {
+  //   setSelectedBrandId(brandId);
+  //   setIsDeleteModalOpen(true);
+  // };
+
+
+
+  // const handleDeleteSuccess = () => {
+  //   // Refresh your brand list here
+  //   console.log("Brand deleted successfully!");
+  // };
+  
   const fetchBrand = async () => {
     try {
       setLoading(true);
@@ -66,18 +82,49 @@ const BrandTable = () => {
         setBrandDetail(data.data);
         setTotalPages(data.totalPages);
       } else {
-        console.log("Unable to get the data");
+        throw new Error(data.message || "Unable to fetch data.");
       }
     } catch (error) {
-      console.log("Error", error);
+      toast.error("Error fetching brands. Please try again.");
+      console.error("Error:", error);
     } finally {
       setLoading(false);
     }
   };
+  
+  const handleDelete = (brandId: string) => {
+    setIsDelete(true);
+    setSelectedBrandId(brandId); // Store the ID of the brand to delete
+  };
+
+  const handleCloseDeleteModal = () => {
+    setSelectedBrandId(null);
+    setIsDeleteModalOpen(false);
+  };
+
+  //const handleDeleteFunc = async() =>{
+//     setLoading(true);
+//     try {
+//         const deleteBrand = await fetch(`${process.env.NEXT_PUBLIC_LOCAL_PORT}/brands/delete-brand/${brandDetail}`,{
+//             method: 'DELETE',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 },
+//         })
+//         const response = await deleteBrand.json()
+//         if(deleteBrand){
+//             toast.success("Deleted Successfully");
+//             setIsDelete(true)
+//             // state = false
+//         }
+//     } catch (error) {
+//         console.log(error)
+//     }
+// }// 
 
   useEffect(() => {
     fetchBrand();
-  }, [currentPage,debouncedSearch]); // Refetch when page or searchTerm changes
+  }, [currentPage,debouncedSearch,isDeleted]); // Refetch when page or searchTerm changes
 
  
   return (
@@ -129,7 +176,7 @@ const BrandTable = () => {
                     </TableRow>
                     </TableHeader>
                     <TableBody className="text-xl">
-                    {brandDetail.map((brand) => (
+                    {Array.isArray(brandDetail) && brandDetail.map((brand) => (
                         <TableRow
                         key={brand._id}
                         className="hover:bg-gray-50 transition-colors"
@@ -161,14 +208,15 @@ const BrandTable = () => {
                             <Button
                                 variant="ghost"
                                 size="sm"
+                                onClick={()=>router.push(`/brands/add-model/${brand._id}`)}
                                 className="hover:bg-blue-100 text-blue-600 hover:text-blue-600 p-2 h-8 w-8"
                             >
-                                <Eye className="h-4 w-4" />
+                                <Plus className="h-4 w-4" />
                             </Button>
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => router.push(`/brands/${brand._id}`)}
+                                onClick={() => router.push(`/brands/edit/${brand._id}`)}
                                 className="hover:bg-green-100 text-green-600 hover:text-green-600 p-2 h-8 w-8"
                             >
                                 <Edit2 className="h-4 w-4" />
@@ -177,6 +225,7 @@ const BrandTable = () => {
                                 variant="ghost"
                                 size="sm"
                                 className="hover:bg-red-100 text-red-600 hover:text-red-600 p-2 h-8 w-8"
+                                onClick={()=>handleDelete(brand._id)}
                             >
                                 <Trash2 className="h-4 w-4" />
                             </Button>
@@ -194,6 +243,14 @@ const BrandTable = () => {
                     </TableRow>
                     </TableFooter>
             </Table>
+            {isDelete && selectedBrandId ? (
+              <DeleteForm  
+              onClose={handleCloseDeleteModal}
+              brandId={selectedBrandId}
+              onDeleteSuccess={setIsDeleted} 
+              />
+            ) : null}
+
             </div>
                 
             )}

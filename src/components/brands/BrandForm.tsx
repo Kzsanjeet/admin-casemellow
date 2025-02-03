@@ -14,8 +14,8 @@ import { toast } from "sonner";
 
 interface BrandFormData {
   brandName: string;
-  modelName: string;
-  coverTypes: string[];
+  // modelName: string;
+  // coverTypes: string[];
 }
 
 const BrandForm = () => {
@@ -23,35 +23,11 @@ const BrandForm = () => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<BrandFormData>({
     brandName: "",
-    modelName: "",
-    coverTypes: [],
+    // modelName: "",
+    // coverTypes: [],
   });
 
-  const coverTypes = [
-    "Premium Double Layer",
-    "3D hard cover",
-    "2D Cover",
-  ];
 
-  const handleCoverTypeChange = (type: string) => {
-    setFormData(prev => {
-      const updatedCoverTypes = prev.coverTypes.includes(type)
-        ? prev.coverTypes.filter(t => t !== type)
-        : [...prev.coverTypes, type];
-
-      return {
-        ...prev,
-        coverTypes: updatedCoverTypes
-      };
-    });
-  };
-
-  const handleSelectAllCoverTypes = () => {
-    setFormData(prev => ({
-      ...prev,
-      coverTypes: prev.coverTypes.length === coverTypes.length ? [] : [...coverTypes]
-    }));
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -66,9 +42,9 @@ const BrandForm = () => {
     setLoading(true);
 
     try {
-      if (!formData.brandName || !formData.modelName || formData.coverTypes.length === 0) {
-        throw new Error("Please fill in all required fields");
-      }
+      // if (!formData.brandName || !formData.modelName || formData.coverTypes.length === 0) {
+      //   throw new Error("Please fill in all required fields");
+      // }
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_LOCAL_PORT}/add-brand`, {
         method: 'POST',
@@ -77,12 +53,12 @@ const BrandForm = () => {
         },
         body: JSON.stringify({
           brandName: formData.brandName,
-          phoneModels:[
-            {
-                modelName: formData.modelName,
-                coverTypes: formData.coverTypes
-            }
-          ]
+          // phoneModels:[
+          //   {
+          //       modelName: formData.modelName,
+          //       coverTypes: formData.coverTypes
+          //   }
+          // ]
         })
       });
 
@@ -146,7 +122,7 @@ const BrandForm = () => {
             </div>
 
             {/* Model Name */}
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <label
                 htmlFor="modelName"
                 className="text-sm font-medium text-gray-700"
@@ -163,45 +139,8 @@ const BrandForm = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all"
                 required
               />
-            </div>
+            </div> */}
 
-            {/* Cover Types */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Cover Types Available
-                </label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSelectAllCoverTypes}
-                  className="text-xs px-2 py-1 h-7"
-                >
-                  {formData.coverTypes.length === coverTypes.length ? 'Unselect All' : 'Select All'}
-                </Button>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {coverTypes.map((type) => (
-                  <label
-                    key={type}
-                    className={`flex items-center space-x-2 p-3 border rounded-lg cursor-pointer transition-colors ${
-                      formData.coverTypes.includes(type) 
-                        ? 'bg-blue-100 border-gray-400' 
-                        : 'hover:bg-gray-50'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={formData.coverTypes.includes(type)}
-                      onChange={() => handleCoverTypeChange(type)}
-                      className="rounded border-gray-300 text-gray-900 focus:ring-gray-400"
-                    />
-                    <span className="text-sm text-gray-700">{type}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
 
             {/* Actions */}
             <div className="flex gap-4 pt-4">
