@@ -426,11 +426,11 @@ const ProductTable = () => {
                 }
             )
             
-            if (!response.ok) {
-                throw new Error('Failed to fetch products')
-            }
+            // if (!response.ok) {
+            //     throw new Error('Failed to fetch products')
+            // }
 
-            const result: ApiResponse = await response.json()
+            const result = await response.json()
             
             if (result.success) {
                 setProductDetails(result.data)
@@ -438,7 +438,13 @@ const ProductTable = () => {
                 setTotalProducts(result.totalProducts)
                 setCurrentPage(result.currentPage)
             } else {
-                throw new Error('Failed to fetch products')
+                if (result.message === "No products found") {
+                    // Set a specific state for "no products found" response
+                    setError("no_products")
+                    setProductDetails([])
+                } else {
+                    throw new Error(result.message || 'Failed to fetch products')
+                }
             }
         } catch (error) {
             setError(error instanceof Error ? error.message : 'An error occurred')
@@ -471,7 +477,7 @@ const ProductTable = () => {
     
             if (data.success) {
                 toast.success("Status updated successfully");
-                router.refresh(); // Refresh UI
+                //router.refresh(); // Refresh UI
                 //setRefresh((prev) => !prev); // Toggle refresh state to trigger re-fetch
                 // Update the local state instead of re-fetching
             setProductDetails((prev) =>
@@ -503,7 +509,7 @@ const ProductTable = () => {
         setSelectedProductId(productId); // Store the ID of the product to delete
       };
     
-      const handleCloseDeleteModal = () => {
+    const handleCloseDeleteModal = () => {
         setSelectedProductId(null);
         setIsDeleteModalOpen(false);
       };
@@ -557,9 +563,22 @@ const ProductTable = () => {
                         <div className="p-8">
                             <Loader />
                         </div>
+                    )  : error === "no_products" ? (
+                        <div className="p-8 text-center text-gray-500">
+                            {debouncedSearch ? 
+                                `No products found matching "${debouncedSearch}"` : 
+                                "No products found in the database"}
+                        </div>
+                    ) : error ? (
+                        <div className="p-8 text-center text-red-600">
+                            <p>Error: {error}</p>
+                            <Button onClick={fetchProductData} className="mt-4">
+                                Retry
+                            </Button>
+                        </div>
                     ) : productDetails.length === 0 ? (
                         <div className="p-8 text-center text-gray-500">
-                            No products found
+                            No products available
                         </div>
                     ) : (
                         <>

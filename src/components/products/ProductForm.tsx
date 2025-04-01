@@ -43,6 +43,21 @@ const ProductForm = () => {
     coverTypes: [],
   });
 
+  const autoFill = () => {
+    setFormData((prevState) => ({
+      ...prevState, // Keeps existing form data
+      productName: "Abstract case",
+      productPrice: 1250,
+      productDescription: "The best premium cover inspired by abstract theme.",
+      productImage: null, // Ensure it matches expected type (File or string)
+      productCategory: "Abstract",
+      brands: "", // Changed to string
+      phoneModel: "iPhone 11",
+      coverTypes: [], // Ensure it matches expected type (array)
+    }));
+  };
+  
+
   const coverTypes = [
     "Premium Double Layer",
     "3D hard cover",
@@ -174,6 +189,9 @@ const ProductForm = () => {
             >
               <X className="h-5 w-5" />
             </Button>
+            <button onClick={autoFill}>
+              autofill
+            </button>
           </div>
           <p className="text-sm text-gray-500">
             Enter the details for the new product
@@ -311,9 +329,12 @@ const ProductForm = () => {
                 <option value="">Select a category</option>
                 <option value="Anime">Anime</option>
                 <option value="Sports">Sports</option>
-                <option value="Asthetic">Asthetic</option>
-                <option value="Cultural">Cultural</option>
-                <option value="Unique">Unique</option>
+                <option value="Marvel">Marvel</option>
+                <option value="God">God</option>
+                <option value="Mandala">Mandala</option>
+                <option value="Luxury">Luxury</option>
+                <option value="Abstract">Abstract</option>
+                <option value="Abstract">Unique</option>
               </select>
             </div>
 

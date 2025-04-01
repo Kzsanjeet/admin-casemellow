@@ -23,7 +23,10 @@ const AUTH_CONFIG = {
 export async function middleware(request: NextRequest) {
   // Get token from cookies
   const token = request.cookies.get("accessToken")?.value
+
   const pathname = new URL(request.url).pathname
+
+
 
   // Helper function to check path matching
   const matchesPath = (paths: string[]) =>

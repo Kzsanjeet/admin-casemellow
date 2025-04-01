@@ -15,6 +15,7 @@ interface LoginUserProviderProps {
 
 const LoginContext: FC<LoginUserProviderProps> = ({children}) => {
     const [isLoggedIn,setIsLoggedIn] = useState(false);
+    console.log(isLoggedIn)
   return (
     <LoginUserContext.Provider value={{isLoggedIn,setIsLoggedIn}}>
         {children}
