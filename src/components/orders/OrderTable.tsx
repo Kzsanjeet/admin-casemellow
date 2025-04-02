@@ -254,9 +254,10 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { Search, Eye, Trash2 } from "lucide-react"
+import { Search, Eye, Trash2, Plus } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import Loader from "@/components/loading/loader"
+import { useDebounce } from "@/hooks/use-debounce"
 
 export interface Order {
   paymentMethod: "Khalti" | "COD"
@@ -288,10 +289,11 @@ export interface Order {
 const OrderTable = () => {
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
+  const debouncedSearch = useDebounce(searchTerm, 1000)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [orders, setOrders] = useState<Order[]>([])
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1) 
   const [totalPages, setTotalPages] = useState(1)
   const itemsPerPage = 10
 
@@ -300,7 +302,7 @@ const OrderTable = () => {
     setError(null)
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_LOCAL_PORT}/order/get?page=${currentPage}&limit=${itemsPerPage}&search=${searchTerm}`,
+        `${process.env.NEXT_PUBLIC_LOCAL_PORT}/order/get?page=${currentPage}&limit=${itemsPerPage}&search=${debouncedSearch}`,
         {
           method: "GET",
           headers: {
@@ -341,7 +343,7 @@ const OrderTable = () => {
 
   useEffect(() => {
     fetchOrderData()
-  }, [currentPage, searchTerm])
+  }, [currentPage, debouncedSearch])
 
   // Add this useEffect to log orders after they've been updated
   useEffect(() => {
@@ -380,17 +382,31 @@ const OrderTable = () => {
       <div className="w-11/12 mx-auto space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
-            <Input
-              placeholder="Search orders..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-full max-w-sm"
-            />
-          </div>
-        </div>
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
+                        <p className="text-gray-500 mt-1">Manage your orders</p>
+                    </div>
+                    <Button 
+                        onClick={() => router.push("/orders/add-product")}
+                        className="bg-black text-white hover:bg-gray-800"
+                    >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Order
+                    </Button>
+                </div>
+
+                {/* Search Section */}
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                        <Input
+                            placeholder="Search orders..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10 w-full max-w-sm"
+                        />
+                    </div>
+                </div>
 
         {/* Table */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -414,6 +430,7 @@ const OrderTable = () => {
                   <TableHeader>
                     <TableRow className="bg-gray-50 hover:bg-gray-50">
                       <TableHead className="font-semibold">Client</TableHead>
+                      <TableHead className="font-semibold">Product Name</TableHead>
                       <TableHead className="font-semibold">Payment Method</TableHead>
                       <TableHead className="font-semibold">Order Status</TableHead>
                       <TableHead className="font-semibold">Payment Status</TableHead>
@@ -430,18 +447,59 @@ const OrderTable = () => {
                           <TableCell className="font-medium">
                             {order.clientId ? order.clientId.name : "Unknown Client"}
                           </TableCell>
+                          <TableCell>
+                            {order.productId && 
+                            Array.isArray(order.productId) && 
+                            order.productId.length > 0 && 
+                            order.productId[0] && 
+                            order.productId[0].product ? (
+                              <div className="flex items-center space-x-3">
+                                <div className="relative">
+                                  {order.productId[0].product.productImage ? (
+                                    <img
+                                      src={order.productId[0].product.productImage}
+                                      alt={order.productId[0].product.productName || "Product"}
+                                      className="h-10 w-10 rounded-lg object-cover"
+                                    />
+                                  ) : (
+                                    <div className="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center">
+                                      <span className="text-xs text-gray-500">No image</span>
+                                    </div>
+                                  )}
+                                  {order.productId.length > 1 && (
+                                    <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                                      +{order.productId.length - 1}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex flex-col">
+                                  <span className="font-medium text-gray-900">
+                                    {order.productId[0].product.productName || "Unnamed Product"}
+                                  </span>
+                                  {order.productId.length > 1 && (
+                                    <span className="text-xs text-gray-500">
+                                      and {order.productId.length - 1} more items
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            ) : (
+                              "No products"
+                            )}
+                          </TableCell>                                                   
 
                           {/* Payment Method */}
-                          <TableCell>{order.paymentMethod || "N/A"}</TableCell>
-
+                          <TableCell className={order.paymentMethod === "COD" ? "text-green-500 font-medium" : "text-blue-500 font-medium"}>
+                            {order.paymentMethod === "COD" ? "COD" : order.paymentMethod}
+                          </TableCell>
                           {/* Order Status */}
                           <TableCell>
-                            <span className="font-medium text-gray-900">{order.orderStatus || "N/A"}</span>
+                            <span className={order.orderStatus === "pending"?"font-medium text-red-500":"text-green-500 font-medium"}>{order.orderStatus || "N/A"}</span>
                           </TableCell>
 
                           {/* Payment Status */}
                           <TableCell>
-                            <span className="font-medium">{order.paymentStatus || "N/A"}</span>
+                            <span className={order.paymentStatus === "pending"?"font-medium text-red-500":"text-green-500 font-medium"}>{order.paymentStatus || "N/A"}</span>
                           </TableCell>
 
                           {/* Total Price - Using the safe formatter */}

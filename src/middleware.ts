@@ -9,7 +9,7 @@ const AUTH_CONFIG = {
     "/home",
     "/brands",
     "/products",
-    "/wellness",
+    "/orders",
     "/blogs",
     "/activities",
     "/plan-trip",
