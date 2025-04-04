@@ -254,10 +254,12 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { Search, Eye, Trash2, Plus } from "lucide-react"
+import { Search, Eye, Trash2, Plus, Edit, Edit2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import Loader from "@/components/loading/loader"
 import { useDebounce } from "@/hooks/use-debounce"
+import EditPaymentStatus from "./EditPaymentStatus"
+import EditOrderStatus from "./EditOrderStatus"
 
 export interface Order {
   paymentMethod: "Khalti" | "COD"
@@ -281,7 +283,7 @@ export interface Order {
   deliveryAddress: string
   totalQuantity: number
   orderStatus: "pending" | "picked up" | "sent for delivery" | "delivered"
-  paymentStatus: "pending" | "paid" | "failed"
+  paymentStatus: "pending" | "paid" | "cancel"
   totalPrice: number
   orderDate: string // ISO Date string
 }
@@ -296,6 +298,12 @@ const OrderTable = () => {
   const [currentPage, setCurrentPage] = useState(1) 
   const [totalPages, setTotalPages] = useState(1)
   const itemsPerPage = 10
+  const [editOrders, setEditOrders] = useState(false)
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isEditPaymentModalOpen, setIsEditPaymentModalOpen] = useState(false);
+  const [isEditOrderModalOpen, setIsEditOrderModalOpen] = useState(false);
+
 
   const fetchOrderData = async () => {
     setLoading(true)
@@ -356,9 +364,6 @@ const OrderTable = () => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)))
   }
 
-  const handleViewOrder = (orderId: string) => {
-    router.push(`/orders/${orderId}`)
-  }
 
   // Helper function to safely format price
   const formatPrice = (price: any) => {
@@ -376,6 +381,31 @@ const OrderTable = () => {
       return `Rs ${price}`
     }
   }
+
+  const handleUpdateSuccess = () => {
+    fetchOrderData(); // Refetch orders to update the table
+  };
+  
+  const handleEditPaymentStatus = (orderId: string) => {
+    setSelectedOrderId(orderId);
+    setIsEditPaymentModalOpen(true);
+  };
+  
+  const handleEditOrderStatus = (orderId: string) => {
+    setSelectedOrderId(orderId);
+    setIsEditOrderModalOpen(true);
+  };
+  
+  const handleClosePaymentModal = () => {
+    setSelectedOrderId(null);
+    setIsEditPaymentModalOpen(false);
+  };
+  
+  const handleCloseOrderModal = () => {
+    setSelectedOrderId(null);
+    setIsEditOrderModalOpen(false);
+  };
+
 
   return (
     <div className="p-8 flex w-full bg-gray-100 min-h-screen">
@@ -489,17 +519,34 @@ const OrderTable = () => {
                           </TableCell>                                                   
 
                           {/* Payment Method */}
-                          <TableCell className={order.paymentMethod === "COD" ? "text-green-500 font-medium" : "text-blue-500 font-medium"}>
+                          <TableCell className={order.paymentMethod === "COD" ? "text-black font-medium" : "text-black font-medium"}>
                             {order.paymentMethod === "COD" ? "COD" : order.paymentMethod}
                           </TableCell>
+
                           {/* Order Status */}
                           <TableCell>
-                            <span className={order.orderStatus === "pending"?"font-medium text-red-500":"text-green-500 font-medium"}>{order.orderStatus || "N/A"}</span>
-                          </TableCell>
+                            <div className="flex px-1 items-center space-x-2">
+                            <span className={order.orderStatus === "pending" ? "font-medium text-red-500" : "text-green-500 font-medium"}>
+                            {order.orderStatus || "N/A"}
+                            </span>
+                            {/* Order Status Edit */}
+                            <button onClick={() => handleEditOrderStatus(order._id)}>
+                              <Edit2 className="hover:underline" size={20} />
+                            </button>
+                            </div>
+                        </TableCell>
 
                           {/* Payment Status */}
                           <TableCell>
-                            <span className={order.paymentStatus === "pending"?"font-medium text-red-500":"text-green-500 font-medium"}>{order.paymentStatus || "N/A"}</span>
+                            <div className="flex px-1 items-center space-x-2">
+                            <span className={order.paymentStatus === "pending" || order.paymentStatus === "cancel"?"font-medium text-red-500":"text-green-500 font-medium"}>{order.paymentStatus || "N/A"}</span>
+                            <span className="text-blue-500 cursor-pointer hover:underline" title="Edit payment Status">
+                            {/* Payment Status Edit */}
+                            <button onClick={() => handleEditPaymentStatus(order._id)}>
+                              <Edit2 className="hover:underline" size={20} />
+                            </button>
+                            </span>
+                            </div>
                           </TableCell>
 
                           {/* Total Price - Using the safe formatter */}
@@ -515,13 +562,6 @@ const OrderTable = () => {
                           {/* Actions */}
                           <TableCell className="text-right">
                             <div className="flex justify-end space-x-2">
-                              <Button
-                                variant="ghost"
-                                className="hover:bg-blue-100 text-blue-600 hover:text-blue-700 p-2 h-8 w-8"
-                                onClick={() => handleViewOrder(order._id)}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
                               <Button
                                 variant="ghost"
                                 className="text-red-600 hover:bg-red-100 hover:text-red-700"
@@ -541,6 +581,21 @@ const OrderTable = () => {
                     </TableRow>
                   </TableFooter>
                 </Table>
+                {isEditPaymentModalOpen && selectedOrderId && (
+                  <EditPaymentStatus
+                    onClose={handleClosePaymentModal}
+                    orderId={selectedOrderId}
+                    onUpdateSuccess={handleUpdateSuccess} 
+                  />
+                )}
+
+                {isEditOrderModalOpen && selectedOrderId && (
+                  <EditOrderStatus
+                    onClose={handleCloseOrderModal}
+                    orderId={selectedOrderId}
+                    onUpdateSuccess={handleUpdateSuccess} 
+                  />
+                )}
               </div>
 
               {/* Pagination */}
