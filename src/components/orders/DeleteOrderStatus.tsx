@@ -5,11 +5,11 @@ import { toast } from 'sonner';
 
 interface DeleteFormProps {
   onClose: () => void; // Callback to close the modal
-  productId: string; // ID of the brand to delete
+  orderId: string; // ID of the brand to delete
   onDeleteSuccess: (isDeleted: boolean) => void; // Callback after successful deletion
 }
 
-const ProductDeleteFrom = ({ onClose, productId, onDeleteSuccess}: DeleteFormProps) => {
+const OrderDeleteFrom = ({ onClose, orderId, onDeleteSuccess}: DeleteFormProps) => {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
   //   const [error, setError] = useState<string | null>(null);
@@ -19,7 +19,7 @@ const ProductDeleteFrom = ({ onClose, productId, onDeleteSuccess}: DeleteFormPro
       // setError(null); // Clear any previous errors
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_LOCAL_PORT}/products/delete/${productId}`,
+          `${process.env.NEXT_PUBLIC_LOCAL_PORT}/order/delete/${orderId}`,
           {
             method: "DELETE",
             headers: {
@@ -30,7 +30,7 @@ const ProductDeleteFrom = ({ onClose, productId, onDeleteSuccess}: DeleteFormPro
         const data = await response.json();
   
         if (response.ok) {
-          toast.success(data.message || "Product deleted successfully!");
+          toast.success(data.message || "Order deleted successfully!");
           // onDeleteSuccess(); // Trigger parent callback to refresh or update
           onClose(); // Close the modal
           onDeleteSuccess(true)
@@ -77,4 +77,4 @@ const ProductDeleteFrom = ({ onClose, productId, onDeleteSuccess}: DeleteFormPro
   )
 }
 
-export default ProductDeleteFrom
+export default OrderDeleteFrom

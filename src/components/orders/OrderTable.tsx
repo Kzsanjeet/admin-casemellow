@@ -260,6 +260,7 @@ import Loader from "@/components/loading/loader"
 import { useDebounce } from "@/hooks/use-debounce"
 import EditPaymentStatus from "./EditPaymentStatus"
 import EditOrderStatus from "./EditOrderStatus"
+import OrderDeleteFrom from "./DeleteOrderStatus"
 
 export interface Order {
   paymentMethod: "Khalti" | "COD"
@@ -300,9 +301,12 @@ const OrderTable = () => {
   const itemsPerPage = 10
   const [editOrders, setEditOrders] = useState(false)
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEditPaymentModalOpen, setIsEditPaymentModalOpen] = useState(false);
   const [isEditOrderModalOpen, setIsEditOrderModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
 
 
   const fetchOrderData = async () => {
@@ -351,7 +355,7 @@ const OrderTable = () => {
 
   useEffect(() => {
     fetchOrderData()
-  }, [currentPage, debouncedSearch])
+  }, [currentPage, debouncedSearch, isDeleted])
 
   // Add this useEffect to log orders after they've been updated
   useEffect(() => {
@@ -404,6 +408,16 @@ const OrderTable = () => {
   const handleCloseOrderModal = () => {
     setSelectedOrderId(null);
     setIsEditOrderModalOpen(false);
+  };
+
+  const handleDelete = (orderId: string) => {
+    setIsDelete(true);
+    setSelectedOrderId(orderId); 
+  };
+
+const handleCloseDeleteModal = () => {
+    setSelectedOrderId(null);
+    setIsDeleteModalOpen(false);
   };
 
 
@@ -565,7 +579,7 @@ const OrderTable = () => {
                               <Button
                                 variant="ghost"
                                 className="text-red-600 hover:bg-red-100 hover:text-red-700"
-                                // onClick={() => handleDelete && handleDelete(order._id)}
+                                onClick={() =>handleDelete(order._id)}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -596,6 +610,13 @@ const OrderTable = () => {
                     onUpdateSuccess={handleUpdateSuccess} 
                   />
                 )}
+                  {isDelete && selectedOrderId ? (
+                    <OrderDeleteFrom
+                    onClose={handleCloseDeleteModal}
+                    orderId={selectedOrderId}
+                    onDeleteSuccess={setIsDeleted} 
+                    />
+                  ) : null}
               </div>
 
               {/* Pagination */}
