@@ -19,6 +19,7 @@ import { Pagination, PaginationContent, PaginationLink, PaginationNext, Paginati
 import { useDebounce } from '@/hooks/use-debounce'
 import Loader from '@/components/loading/loader'
 import { toast } from 'sonner'
+import CustomizeDeleteFrom from './CustomizeDeleteForm'
 
 
 interface Brand {
@@ -34,7 +35,7 @@ interface ICustomize {
         brandName: string;
       };
     phoneModel: string;
-    coverType: string[];
+    coverType: string;
     coverPrice: number;
     mockUpImage?: string;
     productDescription: string;
@@ -51,61 +52,61 @@ interface ApiResponse {
     currentPage: number;
 }
 
-interface CoverTypeDisplayProps {
-    coverTypes: string[];
-}
+// interface CoverTypeDisplayProps {
+//     coverTypes: string[];
+// }
 
-const CoverTypeDisplay: React.FC<CoverTypeDisplayProps> = ({ coverTypes }) => {
-    const [isExpanded, setIsExpanded] = useState(false);
-    const displayLimit = 2;
+// const CoverTypeDisplay: React.FC<CoverTypeDisplayProps> = ({ coverTypes }) => {
+//     const [isExpanded, setIsExpanded] = useState(false);
+//     const displayLimit = 2;
 
-    const getBackgroundColor = (index: number) => {
-        const colors = [
-            'bg-blue-500 hover:bg-blue-600',
-            'bg-green-500 hover:bg-green-600',
-            'bg-purple-500 hover:bg-purple-600',
-            'bg-orange-500 hover:bg-orange-600',
-            'bg-pink-500 hover:bg-pink-600'
-        ];
-        return colors[index % colors.length];
-    };
+//     const getBackgroundColor = (index: number) => {
+//         const colors = [
+//             'bg-blue-500 hover:bg-blue-600',
+//             'bg-green-500 hover:bg-green-600',
+//             'bg-purple-500 hover:bg-purple-600',
+//             'bg-orange-500 hover:bg-orange-600',
+//             'bg-pink-500 hover:bg-pink-600'
+//         ];
+//         return colors[index % colors.length];
+//     };
 
-    if (!coverTypes || coverTypes.length === 0) {
-        return <span className="text-gray-500">No Cover Types</span>;
-    }
+//     if (!coverTypes || coverTypes.length === 0) {
+//         return <span className="text-gray-500">No Cover Types</span>;
+//     }
 
-    const displayedTypes = isExpanded ? coverTypes : coverTypes.slice(0, displayLimit);
-    const remainingCount = coverTypes.length - displayLimit;
+//     const displayedTypes = isExpanded ? coverTypes : coverTypes.slice(0, displayLimit);
+//     const remainingCount = coverTypes.length - displayLimit;
 
-    return (
-        <div className="flex flex-wrap gap-2 items-center">
-            {displayedTypes.map((cover, index) => (
-                <span
-                    key={index}
-                    className={`px-3 py-1 rounded-full text-white text-sm font-medium transition-colors duration-200 ${getBackgroundColor(index)}`}
-                >
-                    {cover}
-                </span>
-            ))}
-            {!isExpanded && remainingCount > 0 && (
-                <button
-                    onClick={() => setIsExpanded(true)}
-                    className="px-2 py-1 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 text-sm font-medium transition-colors duration-200"
-                >
-                    +{remainingCount} more
-                </button>
-            )}
-            {isExpanded && coverTypes.length > displayLimit && (
-                <button
-                    onClick={() => setIsExpanded(false)}
-                    className="text-sm text-gray-500 hover:text-gray-700 underline"
-                >
-                    Show less
-                </button>
-            )}
-        </div>
-    );
-};
+//     return (
+//         <div className="flex flex-wrap gap-2 items-center">
+//             {displayedTypes.map((cover, index) => (
+//                 <span
+//                     key={index}
+//                     className={`px-3 py-1 rounded-full text-white text-sm font-medium transition-colors duration-200 ${getBackgroundColor(index)}`}
+//                 >
+//                     {cover}
+//                 </span>
+//             ))}
+//             {!isExpanded && remainingCount > 0 && (
+//                 <button
+//                     onClick={() => setIsExpanded(true)}
+//                     className="px-2 py-1 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 text-sm font-medium transition-colors duration-200"
+//                 >
+//                     +{remainingCount} more
+//                 </button>
+//             )}
+//             {isExpanded && coverTypes.length > displayLimit && (
+//                 <button
+//                     onClick={() => setIsExpanded(false)}
+//                     className="text-sm text-gray-500 hover:text-gray-700 underline"
+//                 >
+//                     Show less
+//                 </button>
+//             )}
+//         </div>
+//     );
+// };
 
 const CustomizeTable = () => {
     const router = useRouter()
@@ -121,7 +122,7 @@ const CustomizeTable = () => {
     const itemsPerPage = 10
 
     const [isDelete,setIsDelete] =  useState(false)
-    const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+    const [selectedCustomizeId, setSelectedCustomizeId] = useState<string | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isDeleted, setIsDeleted] = useState(false);
     
@@ -140,10 +141,6 @@ const CustomizeTable = () => {
                 }
             )
             
-            // if (!response.ok) {
-            //     throw new Error('Failed to fetch products')
-            // }
-
             const result = await response.json()
             
             if (result.success) {
@@ -175,70 +172,24 @@ const CustomizeTable = () => {
     const handlePageChange = (page: number) => {
         setCurrentPage(Math.max(1, Math.min(page, totalPages)))
     }
-
-    // const handleStatusChange = async (productId: string, currentStatus: boolean) => {
-    //     try {
-    //         const updatedStatus = !currentStatus; // Toggle status
-    //         const response = await fetch(
-    //             `${process.env.NEXT_PUBLIC_LOCAL_PORT}/update-product-status/${productId}?status=${updatedStatus}`,
-    //             {
-    //                 method: 'PATCH',
-    //                 headers: { 'Content-Type': 'application/json' },
-    //             }
-    //         );
-    
-    //         const data = await response.json();
-    
-    //         if (data.success) {
-    //             toast.success("Status updated successfully");
-    //             //router.refresh(); // Refresh UI
-    //             //setRefresh((prev) => !prev); // Toggle refresh state to trigger re-fetch
-    //             // Update the local state instead of re-fetching
-    //         setProductDetails((prev) =>
-    //             prev.map((product) =>
-    //                 product._id === productId ? { ...product, isActive: updatedStatus } : product
-    //             )
-    //         );
-    //         } else {
-    //             toast.error(data.message || "Failed to update status");
-    //         }
-    //     } catch (error) {
-    //         console.error("Error updating status:", error);
-    //         toast.error("Something went wrong. Please try again.");
-    //     }
-    // };
-    
- 
-
-    const handleEdit = (productId: string) => {
-        router.push(`/customize/edit/${productId}`)
+    const handleEdit = (customizeId: string) => {
+        router.push(`/customize/edit/${customizeId}`)
     }
 
     const handleView = (productId: string) => {
         router.push(`/products/view-product/${productId}`)
     }
 
-    const handleDelete = (productId: string) => {
+    const handleDelete = (customizeId: string) => {
         setIsDelete(true);
-        setSelectedProductId(productId); // Store the ID of the product to delete
+        setSelectedCustomizeId(customizeId); // Store the ID of the product to delete
       };
     
     const handleCloseDeleteModal = () => {
-        setSelectedProductId(null);
+        setSelectedCustomizeId(null);
         setIsDeleteModalOpen(false);
       };
     
-
-    // if (error) {
-    //     return (
-    //         <div className="p-8 text-center text-red-600">
-    //             <p>Error: {error}</p>
-    //             <Button onClick={fetchProductData} className="mt-4">
-    //                 Retry
-    //             </Button>
-    //         </div>
-    //     )
-    // }
 
     return (
         <div className="p-8 flex w-full bg-gray-100 min-h-screen">
@@ -246,15 +197,15 @@ const CustomizeTable = () => {
                 {/* Header Section */}
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Products</h1>
-                        <p className="text-gray-500 mt-1">Manage your product inventory</p>
+                        <h1 className="text-3xl font-bold text-gray-900">Customize</h1>
+                        <p className="text-gray-500 mt-1">Manage your customize inventory</p>
                     </div>
                     <Button 
-                        onClick={() => router.push("/products/add-product")}
+                        onClick={() => router.push("/customize/add")}
                         className="bg-black text-white hover:bg-gray-800"
                     >
                         <Plus className="mr-2 h-4 w-4" />
-                        Add Product
+                        Add Customize
                     </Button>
                 </div>
 
@@ -263,7 +214,7 @@ const CustomizeTable = () => {
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                         <Input
-                            placeholder="Search products..."
+                            placeholder="Search models..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-10 w-full max-w-sm"
@@ -320,7 +271,7 @@ const CustomizeTable = () => {
                                                 </TableCell>
                                                 <TableCell>{product.brands?.brandName || 'No Brand'}</TableCell>
                                                 <TableCell>
-                                                    <CoverTypeDisplay coverTypes={product.coverType} />
+                                                    {product.coverType}
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className="font-medium">
@@ -367,13 +318,13 @@ const CustomizeTable = () => {
                                         </TableRow>
                                     </TableFooter>
                                 </Table>
-                                {/* {isDelete && selectedProductId ? (
-                                    <ProductDeleteFrom 
-                                    onClose={handleCloseDeleteModal}
-                                    productId={selectedProductId}
-                                    onDeleteSuccess={setIsDeleted} 
-                                    />
-                                ) : null} */}
+                               
+                                {isDelete && selectedCustomizeId ? (
+                                <CustomizeDeleteFrom
+                                onClose={handleCloseDeleteModal}
+                                customizeId={selectedCustomizeId}
+                                onDeleteSuccess={setIsDeleted} />
+                                ) : null}
                             </div>
 
                             {/* Pagination */}

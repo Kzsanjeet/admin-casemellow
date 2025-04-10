@@ -13,7 +13,7 @@ export interface ICustomize {
         brandName: string;
       };
       phoneModel: string;
-      coverType: string[];
+      coverType: string;
       coverPrice: number;
       mockUpImage?: string;
       isActive: boolean;
