@@ -7,6 +7,7 @@ import { Toaster } from "sonner";
 import { usePathname } from "next/navigation";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import LoginContext, { LoginUserContext } from "@/provider/LoginContext";
+import { Provider } from "@/provider/Providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,7 +41,9 @@ return (
   <html lang="en">
     <body
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      suppressHydrationWarning
     >
+      <Provider>
       <LoginContext>
         <SidebarProvider>
           {!isLoginPage &&
@@ -58,6 +61,7 @@ return (
             {children}
         </SidebarProvider>
       </LoginContext>
+      </Provider>
     </body>
   </html>
 );

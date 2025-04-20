@@ -7,7 +7,6 @@ import React, { useEffect, useState } from "react";
 
 export interface ICustomize {
       _id: string;
-      mockUpName: string;
       brands: {
         _id: string;
         brandName: string;

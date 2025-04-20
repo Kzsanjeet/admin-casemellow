@@ -118,7 +118,7 @@ const CustomizeTable = () => {
     const [currentPage, setCurrentPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [totalProducts, setTotalProducts] = useState(0)
-    const [refresh, setRefresh] = useState(false); // State to track refresh
+    // const [refresh, setRefresh] = useState(false); // State to track refresh
     const itemsPerPage = 10
 
     const [isDelete,setIsDelete] =  useState(false)
@@ -167,7 +167,7 @@ const CustomizeTable = () => {
 
     useEffect(() => {
         fetchProductData()
-    }, [currentPage, debouncedSearch,refresh,isDeleted])
+    }, [currentPage, debouncedSearch,isDeleted])
 
     const handlePageChange = (page: number) => {
         setCurrentPage(Math.max(1, Math.min(page, totalPages)))
@@ -265,7 +265,7 @@ const CustomizeTable = () => {
                                                     <img
                                                         src={product.mockUpImage}
                                                         alt={product.phoneModel}
-                                                        className="h-10 w-10 rounded-lg object-cover"
+                                                        className="h-20 w-10 rounded-lg object-cover"
                                                     />
                                                     <span className="font-medium text-gray-900">{product.phoneModel}</span>
                                                 </TableCell>

@@ -3,11 +3,11 @@ import React, { FormEvent, useContext, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useRouter } from 'next/navigation'
+import {  useRouter } from 'next/navigation'
 import Loader from '@/components/loading/loader'
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
-import { LoginUserContext } from '@/provider/LoginContext'
-import Cookies from "js-cookie"
+// import { LoginUserContext } from '@/provider/LoginContext'
+import { signIn } from 'next-auth/react'
 
 
 const Login = () => {
@@ -16,35 +16,49 @@ const Login = () => {
     const [loading, setLoading] = useState(false)
     const router = useRouter()
     const [showPassword, setShowPassword] = useState(false)
-    const {isLoggedIn,setIsLoggedIn} = useContext(LoginUserContext)!
+    // const {isLoggedIn,setIsLoggedIn} = useContext(LoginUserContext)!
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setLoading(true);
     
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_LOCAL_PORT}/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
-                credentials: "include", // Ensure cookies are sent with the request
-            });
+            // const response = await fetch(`${process.env.NEXT_PUBLIC_LOCAL_PORT}/login`, {
+            //     method: "POST",
+            //     headers: { "Content-Type": "application/json" },
+            //     body: JSON.stringify({ email, password }),
+            //     credentials: "include", // Ensure cookies are sent with the request
+            // });
     
-            const data = await response.json();
+            // const data = await response.json();
 
             // if(isLoggedIn === true){
             //     toast.success("Already logged in.")
             //     router.push("/home")
             // }else{
-                if (response.ok) {
-                    toast.success("Login successful");
-                    setIsLoggedIn(true);
-                    router.push("/home");
-                } else {
-                    toast.error(data.error || "Login failed.");
-                    setIsLoggedIn(false);
-                }
+                // if (response.ok) {
+                //     toast.success("Login successful");
+                //     setIsLoggedIn(true);
+                //     router.push("/home");
+                // } else {
+                //     toast.error(data.error || "Login failed.");
+                //     setIsLoggedIn(false);
+                // }
             // }
+            console.log(email,password)
+
+            const result = await signIn("user-credentials",{
+                identifier:email,
+                password,
+                redirect:false,
+                callbackUrl:"/home"
+            })
+            // console.log("result",result)
+            if (result?.error) {
+                toast.error(result.error)
+              } else if (result?.url) {
+                router.push(result.url)
+              }
             
             
         } catch (error) {

@@ -18,6 +18,8 @@ import {
   DropdownMenuTrigger,
 } from "./dropdown-menu";
 import Image from "next/image";
+import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const items = [
   {
@@ -35,11 +37,11 @@ const items = [
     url: "/brands",
     icon: Inbox,
   },
-  {
-    title: "Offers",
-    url: "/offers",
-    icon: Calendar,
-  },
+  // {
+  //   title: "Offers",
+  //   url: "/offers",
+  //   icon: Calendar,
+  // },
   {
     title: "Orders",
     url: "/orders",
@@ -51,18 +53,25 @@ const items = [
     icon: Search,
   },
   {
-    title: "PromoCode",
-    url: "/promocodes",
-    icon: Inbox,
+    title: "Custom Orders",
+    url: "/customize/orders",
+    icon: Settings,
   },
   {
     title: "Customer",
     url: "/happy-customers",
     icon: Settings,
-  },
+  }
 ];
 
 export function AppSidebar() {
+const router = useRouter();
+
+  const handleSignOut = async() => {
+    await signOut({ redirect: false })
+    router.push("/login") 
+  }
+
   return (
     <Sidebar className="flex flex-col h-screen">
       {/* Logo Section */}
@@ -130,7 +139,7 @@ export function AppSidebar() {
                     <DropdownMenuItem className="py-2 text-xl text-gray-700">
                       <span>Account</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="py-2 text-xl text-gray-700">
+                    <DropdownMenuItem onClick={handleSignOut} className="py-2 text-xl text-gray-700">
                       <span>Sign out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>

@@ -3,42 +3,44 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { Search, Trash2, Plus, Edit2 } from "lucide-react"
+import { Search, Trash2, Plus, Edit2, Indent, Link, Download } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import Loader from "@/components/loading/loader"
 import { useDebounce } from "@/hooks/use-debounce"
-import EditPaymentStatus from "./EditPaymentStatus"
-import EditOrderStatus from "./EditOrderStatus"
-import OrderDeleteFrom from "./DeleteOrderStatus"
 import { useSession } from "next-auth/react"
 
-import { SessionData } from "@/Types"
+import { SessionData } from "@/Types"                                                           
+import EditPaymentStatus from "./Edit"
+import EditOrderStatus from "./EditOrderStatusCustomize"
+import OrderDeleteFrom from "./Delete"
+import Image from "next/image"
 
 export interface Order {
-  paymentMethod: "Khalti" | "COD"
   _id: string
   clientId: {
     _id: string
     name: string
     number: string
-  }
-  productId: {
-    product: {
-      _id: string
-      productName: string
-      productPrice: number
-      productImage: string
-      productCategory: string
-    }
-    quantity: number
-  }[]
+  },
+  customize: {
+    _id: string;
+    brands: {
+      _id: string;
+      brandName: string;
+    };
+    phoneModel: string;
+    coverType: string; 
+    coverPrice: number
+  },
+  paymentMethod: "Khalti" | "COD"
+  croppedImage: string,
   pickUpAddress: string
   deliveryAddress: string
   totalQuantity: number
   orderStatus: "pending" | "picked up" | "sent for delivery" | "delivered"
   paymentStatus: "pending" | "paid" | "cancel"
   totalPrice: number
-  orderDate: string // ISO Date string
+  orderDate: string 
 }
 
 const OrderTable = () => {
@@ -64,7 +66,7 @@ const OrderTable = () => {
 
   const session = sessionData as unknown as SessionData
 
-  const userName = session?.user?.id
+  const userName = session?.user?.name
 
 
   const fetchOrderData = async () => {
@@ -72,7 +74,7 @@ const OrderTable = () => {
     setError(null)
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_LOCAL_PORT}/order/get?page=${currentPage}&limit=${itemsPerPage}&search=${debouncedSearch}`,
+        `${process.env.NEXT_PUBLIC_LOCAL_PORT}/order/customize/get?page=${currentPage}&limit=${itemsPerPage}&search=${debouncedSearch}`,
         {
           method: "GET",
           headers: {
@@ -232,6 +234,7 @@ const handleCloseDeleteModal = () => {
                   <TableHeader>
                     <TableRow className="bg-gray-50 hover:bg-gray-50">
                       <TableHead className="font-semibold">Client</TableHead>
+                      <TableHead className="font-semibold">Ordered Design</TableHead>
                       <TableHead className="font-semibold">Product Name</TableHead>
                       <TableHead className="font-semibold">Payment Method</TableHead>
                       <TableHead className="font-semibold">Order Status</TableHead>
@@ -249,46 +252,63 @@ const handleCloseDeleteModal = () => {
                           <TableCell className="font-medium">
                             {order.clientId ? order.clientId.name : "Unknown Client"}
                           </TableCell>
+
+                          {/* 💡 Notes:
+                                The fl_attachment/ in the Cloudinary URL tells it to serve the image as a downloadable file.
+
+                                If order.croppedImage already has upload/ in it, we can replace the URL part after upload/ dynamically.
+
+                                The download attribute ensures the image gets downloaded.
+
+                                Use target="_blank" and rel="noopener noreferrer" for best practice (especially for external links). */}
+
+
                           <TableCell>
-                            {order.productId && 
-                            Array.isArray(order.productId) && 
-                            order.productId.length > 0 && 
-                            order.productId[0] && 
-                            order.productId[0].product ? (
-                              <div className="flex items-center space-x-3">
-                                <div className="relative">
-                                  {order.productId[0].product.productImage ? (
-                                    <img
-                                      src={order.productId[0].product.productImage}
-                                      alt={order.productId[0].product.productName || "Product"}
-                                      className="h-10 w-10 rounded-lg object-cover"
+                            {order._id && order._id.length > 0 ? (
+                                <a
+                                href={`https://res.cloudinary.com/watchmebby/image/upload/fl_attachment/${order.croppedImage.split('/upload/')[1]}`}
+                                download
+                                className="relative group block w-[100px] h-[200px] rounded-xl overflow-hidden"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                >
+                                {order.croppedImage ? (
+                                    <>
+                                    <Image 
+                                        src={order.croppedImage}
+                                        alt="Product"
+                                        width={100}
+                                        height={60}
+                                        className="object-cover w-full h-full transition duration-300 group-hover:opacity-60"
                                     />
-                                  ) : (
-                                    <div className="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center">
-                                      <span className="text-xs text-gray-500">No image</span>
+                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-40">
+                                        <Download className="text-white w-6 h-6" />
                                     </div>
-                                  )}
-                                  {order.productId.length > 1 && (
-                                    <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                                      +{order.productId.length - 1}
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="flex flex-col">
+                                    </>
+                                ) : (
+                                    <div className="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center">
+                                    <span className="text-xs text-gray-500">No image</span>
+                                    </div>
+                                )}
+                                </a>
+                            ) : (
+                                "No products"
+                            )}
+                            </TableCell>
+
+
+                          <TableCell>
+                          <div className="flex flex-col">
                                   <span className="font-medium text-gray-900">
-                                    {order.productId[0].product.productName || "Unnamed Product"}
+                                    {order.customize.phoneModel || "Unnamed Product"}
                                   </span>
-                                  {order.productId.length > 1 && (
+                                  {/* {order.productId.length > 1 && (
                                     <span className="text-xs text-gray-500">
                                       and {order.productId.length - 1} more items
                                     </span>
-                                  )}
+                                  )} */}
                                 </div>
-                              </div>
-                            ) : (
-                              "No products"
-                            )}
-                          </TableCell>                                                   
+                          </TableCell>                                                 
 
                           {/* Payment Method */}
                           <TableCell className={order.paymentMethod === "COD" ? "text-black font-medium" : "text-black font-medium"}>
