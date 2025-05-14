@@ -1,4 +1,4 @@
-import { Calendar, ChevronUp, Home, Inbox, Search, Settings, User2 } from "lucide-react";
+import { Calendar, ChevronUp, Home, Inbox, Search, Settings, ShoppingBag, ShoppingBasketIcon, ShoppingCart, ShoppingCartIcon, User2 } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -18,8 +18,11 @@ import {
   DropdownMenuTrigger,
 } from "./dropdown-menu";
 import Image from "next/image";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { SessionData } from "@/Types";
+
+
 
 const items = [
   {
@@ -30,12 +33,12 @@ const items = [
   {
     title: "Products",
     url: "/products",
-    icon: Calendar,
+    icon: ShoppingCart,
   },
   {
     title: "Brands",
     url: "/brands",
-    icon: Inbox,
+    icon: ShoppingBag,
   },
   // {
   //   title: "Offers",
@@ -45,26 +48,30 @@ const items = [
   {
     title: "Orders",
     url: "/orders",
-    icon: Inbox,
+    icon: ShoppingCartIcon,
   },
   {
     title: "Customize",
     url: "/customize",
-    icon: Search,
+    icon: Inbox,
   },
   {
     title: "Custom Orders",
     url: "/customize/orders",
-    icon: Settings,
+    icon: ShoppingCartIcon,
   },
-  {
-    title: "Customer",
-    url: "/happy-customers",
-    icon: Settings,
-  }
+  // {
+  //   title: "Customer",
+  //   url: "/happy-customers",
+  //   icon: ShoppingCartIcon,
+  // }
 ];
 
 export function AppSidebar() {
+    const { data: sessionData } = useSession()
+    const session = sessionData as unknown as SessionData
+    const userName = session?.user?.name
+
 const router = useRouter();
 
   const handleSignOut = async() => {
@@ -125,8 +132,8 @@ const router = useRouter();
                     <SidebarMenuButton className="w-full px-4 py-3">
                       <div className="flex items-center gap-3">
                         <User2 className="w-5 h-5 text-gray-600" />
-                        <span className="text-gray-700 text-xl font-semibold">
-                          Username
+                        <span className="text-gray-700 text-sm font-semibold">
+                          {userName}
                         </span>
                         <ChevronUp className="ml-auto w-4 h-4 text-gray-500" />
                       </div>
@@ -136,9 +143,9 @@ const router = useRouter();
                     side="top"
                     className="w-[--radix-popper-anchor-width]"
                   >
-                    <DropdownMenuItem className="py-2 text-xl text-gray-700">
+                    {/* <DropdownMenuItem className="py-2 text-xl text-gray-700">
                       <span>Account</span>
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                     <DropdownMenuItem onClick={handleSignOut} className="py-2 text-xl text-gray-700">
                       <span>Sign out</span>
                     </DropdownMenuItem>

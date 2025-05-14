@@ -8,6 +8,7 @@ import Loader from '@/components/loading/loader'
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
 // import { LoginUserContext } from '@/provider/LoginContext'
 import { signIn } from 'next-auth/react'
+import Link from 'next/link'
 
 
 const Login = () => {
@@ -133,12 +134,12 @@ const Login = () => {
                         </div>
 
                         <div className="flex items-center justify-end">
-                            <a
-                                href="#"
+                            <Link 
+                                href={"/forgot-password"}
                                 className="text-sm text-red-600 hover:text-red-700 hover:underline"
                             >
                                 Forgot password?
-                            </a>
+                            </Link>
                         </div>
 
                         <Button

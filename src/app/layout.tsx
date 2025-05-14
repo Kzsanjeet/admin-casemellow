@@ -35,7 +35,7 @@ export default function RootLayout({
   const isForgotPasswordPage = pathname === "/forgot-password"
   const startPage = pathname === "/"
   const isVerifyPage = pathname === "/verify"
-  const isChangePasswordPage = pathname === "/change-password"
+  const isChangePasswordPage = pathname === "/reset-password"
 
 return (
   <html lang="en">

@@ -39,6 +39,8 @@ export interface Order {
   paymentStatus: "pending" | "paid" | "cancel"
   totalPrice: number
   orderDate: string // ISO Date string
+  trackOrderId:string
+  number:string
 }
 
 const OrderTable = () => {
@@ -60,11 +62,11 @@ const OrderTable = () => {
   const [isDeleted, setIsDeleted] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
 
-  const {data:sessionData} = useSession()
+  // const {data:sessionData} = useSession()
 
-  const session = sessionData as unknown as SessionData
+  // const session = sessionData as unknown as SessionData
 
-  const userName = session?.user?.id
+  // const userName = session?.user?.id
 
 
   const fetchOrderData = async () => {
@@ -185,7 +187,7 @@ const handleCloseDeleteModal = () => {
         {/* Header */}
         <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Orders {userName}</h1>
+                        <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
                         <p className="text-gray-500 mt-1">Manage your orders</p>
                     </div>
                     <Button 
@@ -231,9 +233,12 @@ const handleCloseDeleteModal = () => {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-gray-50 hover:bg-gray-50">
+                      <TableHead className="font-semibold">Order Id</TableHead>
                       <TableHead className="font-semibold">Client</TableHead>
                       <TableHead className="font-semibold">Product Name</TableHead>
                       <TableHead className="font-semibold">Payment Method</TableHead>
+                      <TableHead className="font-semibold">Delivery Address</TableHead>
+                      <TableHead className="font-semibold">Number</TableHead>
                       <TableHead className="font-semibold">Order Status</TableHead>
                       <TableHead className="font-semibold">Payment Status</TableHead>
                       <TableHead className="font-semibold">Total Price</TableHead>
@@ -246,6 +251,9 @@ const handleCloseDeleteModal = () => {
                       orders.map((order) => (
                         <TableRow key={order._id} className="hover:bg-gray-50">
                           {/* Client Name */}
+                          <TableCell className="font-medium">
+                            {order._id? order.trackOrderId: "Unknown Id"}
+                          </TableCell>
                           <TableCell className="font-medium">
                             {order.clientId ? order.clientId.name : "Unknown Client"}
                           </TableCell>
@@ -293,6 +301,16 @@ const handleCloseDeleteModal = () => {
                           {/* Payment Method */}
                           <TableCell className={order.paymentMethod === "COD" ? "text-black font-medium" : "text-black font-medium"}>
                             {order.paymentMethod === "COD" ? "COD" : order.paymentMethod}
+                          </TableCell>
+
+                          {/* deliveryAddress */}
+                          <TableCell className="text-black font-medium">
+                            {order.deliveryAddress}
+                          </TableCell>
+
+                          {/* number */}
+                          <TableCell className="text-black font-medium">
+                            {order.number}
                           </TableCell>
 
                           {/* Order Status */}

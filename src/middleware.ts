@@ -79,8 +79,8 @@ export async function middleware(request: NextRequest) {
     "/orders",
     "/customize",
     "/customize/orders",
-    "/plan-trip",
-    "/requests-mails",
+    // "/plan-trip",
+    // "/requests-mails",
     "/users-info",
   ]
 
@@ -143,9 +143,9 @@ export const config = {
     "/products/:path*",
     "/orders/:path*",
     "/customize/:path*",
-    "/activities/:path*",
-    "/plan-trip/:path*",
-    "/requests-mails/:path*",
+    // "/activities/:path*",
+    // "/plan-trip/:path*",
+    // "/requests-mails/:path*",
     "/users-info/:path*",
     "/login", // Include login in matcher
     "/forgot-password", // Include forgot-password in matcher
