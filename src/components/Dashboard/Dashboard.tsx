@@ -4,11 +4,88 @@ import { Box, Package, ShoppingBag, ShoppingCart, Users } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useSession } from "next-auth/react"
 import type { SessionData } from "@/Types"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
-const Dashboard = () => {
+interface DashboardData {
+  products: number;
+  brands: number;
+  orders: number;
+  customize: number;
+  customizeOrders: number;
+}
+
+interface DashboardProps {
+  data: DashboardData;
+}
+export interface PendingOrder {
+  _id: string;
+  trackOrderId: string;
+}
+
+export interface PendingOrderCustomize {
+  _id: string;
+  trackOrderId: string;
+}
+
+
+
+
+const Dashboard: React.FC<DashboardProps> = ({ data })=> {
   const { data: sessionData } = useSession()
   const session = sessionData as unknown as SessionData
   const userName = session?.user?.name
+
+  const [pendingData ,setPendingData] = useState<PendingOrder[]>([])
+  const [pendingCustomizeData ,setPendingCustomizeData] = useState<PendingOrderCustomize[]>([])
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchRecentPending = async() =>{
+  try {
+    const getData = await fetch(`${process.env.NEXT_PUBLIC_LOCAL_PORT}/get-pending-orders`,{
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        },
+    })
+    const data = await getData.json()
+   if (data.success) {
+      setPendingData(data.data);
+    } else {
+      setError(data.message);
+      toast.error(data.message); // Use data.message directly
+    }
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+  const fetchRecentPendingCustomizeOrder = async() =>{
+  try {
+    const getData = await fetch(`${process.env.NEXT_PUBLIC_LOCAL_PORT}/get-pending-customize-orders`,{
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        },
+    })
+    const data = await getData.json()
+   if (data.success) {
+      setPendingCustomizeData(data.data);
+    } else {
+      setError(data.message);
+      toast.error(data.message); // Use data.message directly
+    }
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+useEffect(()=>{
+  fetchRecentPending()
+  fetchRecentPendingCustomizeOrder()
+},[])
 
   return (
     <div className="w-full">
@@ -29,12 +106,7 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">120</div>
-            <div className="flex items-center mt-1">
-              <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-red-500 rounded-full" style={{ width: "65%" }}></div>
-              </div>
-            </div>
+            <div className="text-3xl font-bold">{data.products}</div>
           </CardContent>
         </Card>
 
@@ -46,12 +118,7 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">24</div>
-            <div className="flex items-center mt-1">
-              <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-blue-500 rounded-full" style={{ width: "40%" }}></div>
-              </div>
-            </div>
+            <div className="text-3xl font-bold">{data.brands}</div>
           </CardContent>
         </Card>
 
@@ -63,12 +130,7 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">342</div>
-            <div className="flex items-center mt-1">
-              <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-green-500 rounded-full" style={{ width: "78%" }}></div>
-              </div>
-            </div>
+            <div className="text-3xl font-bold">{data.orders}</div>
           </CardContent>
         </Card>
 
@@ -80,12 +142,7 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">56</div>
-            <div className="flex items-center mt-1">
-              <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-purple-500 rounded-full" style={{ width: "35%" }}></div>
-              </div>
-            </div>
+            <div className="text-3xl font-bold">{data.customize}</div>
           </CardContent>
         </Card>
 
@@ -97,12 +154,7 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">78</div>
-            <div className="flex items-center mt-1">
-              <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-amber-500 rounded-full" style={{ width: "52%" }}></div>
-              </div>
-            </div>
+            <div className="text-3xl font-bold">{data.customizeOrders}</div>
           </CardContent>
         </Card>
       </div>
@@ -114,24 +166,54 @@ const Dashboard = () => {
             <CardTitle>Recent Orders</CardTitle>
           </CardHeader>
           <CardContent>
+          <div className="rounded-md border">
+            {pendingData && pendingData.length > 0 ? (
+              pendingData.map((data) => (
+                <div
+                  key={data._id}
+                  className="flex items-center justify-between p-4 border-b"
+                >
+                  <div className="font-medium">Order #{data.trackOrderId}</div>
+                  <div className="px-2 py-1 text-xs bg-amber-100 text-amber-800 rounded-full">
+                    Pending
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-4 text-sm text-muted-foreground">
+                No recent pending orders.
+              </div>
+            )}
+          </div>
+          </CardContent>
+
+           <CardHeader>
+            <CardTitle>Recent Customized Orders</CardTitle>
+          </CardHeader>
+          <CardContent>
             <div className="rounded-md border">
-              <div className="flex items-center justify-between p-4 border-b">
-                <div className="font-medium">Order #1234</div>
-                <div className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Completed</div>
+            {pendingCustomizeData && pendingCustomizeData.length > 0 ? (
+              pendingCustomizeData.map((data) => (
+                <div
+                  key={data._id}
+                  className="flex items-center justify-between p-4 border-b"
+                >
+                  <div className="font-medium">Order #{data.trackOrderId}</div>
+                  <div className="px-2 py-1 text-xs bg-amber-100 text-amber-800 rounded-full">
+                    Pending
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-4 text-sm text-muted-foreground">
+                No recent pending orders.
               </div>
-              <div className="flex items-center justify-between p-4 border-b">
-                <div className="font-medium">Order #1233</div>
-                <div className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">Processing</div>
-              </div>
-              <div className="flex items-center justify-between p-4">
-                <div className="font-medium">Order #1232</div>
-                <div className="px-2 py-1 text-xs bg-amber-100 text-amber-800 rounded-full">Pending</div>
-              </div>
-            </div>
+            )}
+          </div>
           </CardContent>
         </Card>
 
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Top Products</CardTitle>
           </CardHeader>
@@ -166,7 +248,7 @@ const Dashboard = () => {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>    
     </div>

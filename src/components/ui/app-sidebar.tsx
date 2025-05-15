@@ -1,11 +1,11 @@
-import { Calendar, ChevronUp, Home, Inbox, Search, Settings, ShoppingBag, ShoppingBasketIcon, ShoppingCart, ShoppingCartIcon, User2 } from "lucide-react";
+"use client"
+import { ChevronUp, Home, Inbox, ShoppingBag, ShoppingCart, ShoppingCartIcon, User2 } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -21,63 +21,86 @@ import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { SessionData } from "@/Types";
+import { useEffect, useState } from "react";
 
 
-
-const items = [
-  {
-    title: "Home",
-    url: "/",
-    icon: Home,
-  },
-  {
-    title: "Products",
-    url: "/products",
-    icon: ShoppingCart,
-  },
-  {
-    title: "Brands",
-    url: "/brands",
-    icon: ShoppingBag,
-  },
-  // {
-  //   title: "Offers",
-  //   url: "/offers",
-  //   icon: Calendar,
-  // },
-  {
-    title: "Orders",
-    url: "/orders",
-    icon: ShoppingCartIcon,
-  },
-  {
-    title: "Customize",
-    url: "/customize",
-    icon: Inbox,
-  },
-  {
-    title: "Custom Orders",
-    url: "/customize/orders",
-    icon: ShoppingCartIcon,
-  },
-  // {
-  //   title: "Customer",
-  //   url: "/happy-customers",
-  //   icon: ShoppingCartIcon,
-  // }
-];
+interface Pending{
+   getTotalPendingOrders: number;
+   getTotalPendingCustomize: number;
+}
 
 export function AppSidebar() {
     const { data: sessionData } = useSession()
     const session = sessionData as unknown as SessionData
     const userName = session?.user?.name
 
-const router = useRouter();
+    const[pendingData,setPendingData] = useState<Pending | null >(null)
 
-  const handleSignOut = async() => {
-    await signOut({ redirect: false })
-    router.push("/login") 
-  }
+    const router = useRouter();
+
+    const handleSignOut = async() => {
+      await signOut({ redirect: false })
+      router.push("/login") 
+    }
+    const items = [
+      {
+        title: "Home",
+        url: "/",
+        icon: Home,
+      },
+      {
+        title: "Products",
+        url: "/products",
+        icon: ShoppingCart,
+      },
+      {
+        title: "Brands",
+        url: "/brands",
+        icon: ShoppingBag,
+      },
+      {
+        title: "Orders",
+        url: "/orders",
+        icon: ShoppingCartIcon,
+        badge: (pendingData?.getTotalPendingOrders ?? 0), // ← Add this dynamically later
+      },
+      {
+        title: "Customize",
+        url: "/customize",
+        icon: Inbox,
+      },
+      {
+        title: "Custom Orders",
+        url: "/customize/orders",
+        icon: ShoppingCartIcon,
+         badge: (pendingData?.getTotalPendingCustomize ?? 0), // ← Add this dynamically later
+      }
+    ];
+
+
+    const fetchPendingOrders = async() =>{
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_LOCAL_PORT}/get-pending-count`,{
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            },
+        })
+        const data = await response.json()
+        if(data.success){
+          setPendingData(data.data)
+        }else{
+          console.log(data.message)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    useEffect(()=>{
+      fetchPendingOrders()
+    },[])
+
 
   return (
     <Sidebar className="flex flex-col h-screen">
@@ -108,15 +131,23 @@ const router = useRouter();
                   className="hover:bg-gray-100 py-1 rounded-lg mx-2"
                 >
                   <SidebarMenuButton asChild>
-                    <Link
+                   <Link
                       href={item.url}
-                      className="flex items-center gap-3 px-4 py-3"
+                      className="flex items-center justify-between w-full px-4 py-3"
                     >
-                      <item.icon className="w-5 h-5 size-7 text-gray-600" />
-                      <span className="text-gray-700 text-xl font-medium">
-                        {item.title}
+                      <div className="flex items-center gap-3">
+                        <item.icon className="w-5 h-5 text-gray-600" />
+                        <span className="text-gray-700 text-[18px] font-medium">
+                          {item.title}
+                        </span>
+                      </div>
+                    {typeof item.badge === "number" && item.badge > 0 && (
+                      <span className="text-xs bg-red-500 text-white rounded-full px-2 py-0.5 min-w-[20px] text-center">
+                        {item.badge}
                       </span>
+                    )}
                     </Link>
+
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
