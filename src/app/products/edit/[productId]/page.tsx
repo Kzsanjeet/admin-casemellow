@@ -8,6 +8,7 @@ interface ProductFormData {
     _id: string;
     productName: string;
     productPrice: number;
+    discount:number;
     productDescription: string;
     productImage: string; // Changed from File | null to string
     productCategory: string;
@@ -39,7 +40,7 @@ const Page = () => {
         setProductDetails({
           ...data.data,
           // Ensure the backend returns productImage as a string URL
-          productImage: data.data.productImage || '' 
+          productImage: data.data.productImage || '',
         });
       } else {
         setError("No data found");

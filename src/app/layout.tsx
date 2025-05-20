@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import LoginContext, { LoginUserContext } from "@/provider/LoginContext";
 import { Provider } from "@/provider/Providers";
+import OrderCountContext from "@/provider/OrderCountContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +45,7 @@ return (
       suppressHydrationWarning
     >
       <Provider>
+      <OrderCountContext>
       <LoginContext>
         <SidebarProvider>
           {!isLoginPage &&
@@ -61,6 +63,7 @@ return (
             {children}
         </SidebarProvider>
       </LoginContext>
+      </OrderCountContext>
       </Provider>
     </body>
   </html>

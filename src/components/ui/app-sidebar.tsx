@@ -21,7 +21,8 @@ import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { SessionData } from "@/Types";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { OrderContext } from "@/provider/OrderCountContext";
 
 
 interface Pending{
@@ -36,12 +37,15 @@ export function AppSidebar() {
 
     const[pendingData,setPendingData] = useState<Pending | null >(null)
 
+      const{ordercount} = useContext(OrderContext)!  // for changing the pendign order count
+
     const router = useRouter();
 
     const handleSignOut = async() => {
       await signOut({ redirect: false })
       router.push("/login") 
     }
+
     const items = [
       {
         title: "Home",
@@ -99,7 +103,7 @@ export function AppSidebar() {
 
     useEffect(()=>{
       fetchPendingOrders()
-    },[])
+    },[ordercount])
 
 
   return (

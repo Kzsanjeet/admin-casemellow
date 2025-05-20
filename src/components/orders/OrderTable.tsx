@@ -10,9 +10,6 @@ import { useDebounce } from "@/hooks/use-debounce"
 import EditPaymentStatus from "./EditPaymentStatus"
 import EditOrderStatus from "./EditOrderStatus"
 import OrderDeleteFrom from "./DeleteOrderStatus"
-import { useSession } from "next-auth/react"
-
-import { SessionData } from "@/Types"
 
 export interface Order {
   paymentMethod: "Khalti" | "COD"
@@ -62,11 +59,7 @@ const OrderTable = () => {
   const [isDeleted, setIsDeleted] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
 
-  // const {data:sessionData} = useSession()
 
-  // const session = sessionData as unknown as SessionData
-
-  // const userName = session?.user?.id
 
 
   const fetchOrderData = async () => {

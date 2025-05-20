@@ -144,8 +144,9 @@
 
 // export default EditPaymentStatus;
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { X } from "lucide-react"
+import { OrderContext } from "@/provider/OrderCountContext"
 
 interface EditFormProps {
   onClose: () => void
@@ -158,6 +159,11 @@ const EditPaymentStatus = ({ onClose, orderId, onUpdateSuccess }: EditFormProps)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const {ordercount,setOrdercount} = useContext(OrderContext)!  // for updating the order count
+
+  const toggle = () =>{
+    setOrdercount(!ordercount)
+  }
 
   const handleUpdate = async () => {
     if (!paymentStatus) {
@@ -188,6 +194,7 @@ const EditPaymentStatus = ({ onClose, orderId, onUpdateSuccess }: EditFormProps)
           if (onUpdateSuccess) onUpdateSuccess()
           onClose()
         }, 1000)
+        toggle()
       } else {
         setError(data.message || "Failed to update payment status")
       }
@@ -205,18 +212,6 @@ const EditPaymentStatus = ({ onClose, orderId, onUpdateSuccess }: EditFormProps)
       onClose()
     }
   }
-
-  // Handle escape key to close
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose()
-      }
-    }
-
-    window.addEventListener("keydown", handleEsc)
-    return () => window.removeEventListener("keydown", handleEsc)
-  }, [onClose])
 
   return (
     <div

@@ -1,5 +1,5 @@
 "use client"
-import { PieChart } from '@/components/Charts/Barchart'
+import PieChart from '@/components/Charts/Barchart';
 import Dashboard from '@/components/Dashboard/Dashboard'
 import React, { useEffect, useState } from 'react'
 interface DashboardData {
@@ -10,9 +10,19 @@ interface DashboardData {
   customizeOrders: number;
 }
 
+interface ChartEntry {
+  month: string;
+  normalOrders: number;
+  customizedOrders: number;
+}
+
+
+
+
 const page = () => {
-  const [dashboardData ,setDashboardData] = useState<DashboardData | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [dashboardData ,setDashboardData] = useState<DashboardData | null>(null);
+  const [chartData ,setChartData] = useState<ChartEntry[]>([]);
+  const [error, setError] = useState<string | null>(null)   
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,6 +47,30 @@ const page = () => {
     fetchData()
   }, [])
 
+  useEffect(()=>{
+      const getTotalOrdersComparison = async() =>{
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_LOCAL_PORT}/get-total-oders`,{
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            },
+        })
+        const data = await response.json()
+        if(data.success){
+          setChartData(data.data)
+        }else{
+          setError(data.message || 'Something went wrong')
+        }
+      } catch (error:any) {
+        setError(error.message || 'Fetch failed')
+      }
+  }
+  getTotalOrdersComparison()
+  },[])
+
+
+
   return (
     <div className='w-full'>
       <div>
@@ -48,9 +82,16 @@ const page = () => {
           <p>Loading...</p>
         )}
       </div>
-      <div>
-        <PieChart />
+     <div className='w-4/5'>
+        {chartData ? (
+          <PieChart data={chartData} />
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : (
+          <p>Loading chart...</p>
+        )}
       </div>
+
     </div>
   )
 }

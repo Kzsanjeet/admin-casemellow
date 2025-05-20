@@ -19,6 +19,7 @@ interface Brand {
 interface ProductFormData {
   productName: string;
   productPrice: number;
+  discount:number;
   productDescription: string;
   productImage: File | null;
   productCategory: string;
@@ -35,6 +36,7 @@ const ProductForm = () => {
   const [formData, setFormData] = useState<ProductFormData>({
     productName: "",
     productPrice: 0,
+    discount: 0,
     productDescription: "",
     productImage: null,
     productCategory: "",
@@ -75,6 +77,7 @@ const ProductForm = () => {
     const fieldMapping: { [key: string]: string } = {
       'name': 'productName',
       'price': 'productPrice',
+      'discount': 'discount',
       'description': 'productDescription',
       'category': 'productCategory',
       'brand': 'brands', // Updated to match new field name
@@ -239,6 +242,26 @@ const ProductForm = () => {
               />
             </div>
 
+             {/* discount*/}
+             <div className="space-y-2">
+              <label
+                htmlFor="price"
+                className="text-sm font-medium text-gray-700"
+              >
+                Discount (%)
+              </label>
+              <input
+                type="number"
+                id="discount"
+                name="discount"
+                value={formData.discount}
+                onChange={handleInputChange}
+                placeholder="Enter discount in percent eg: 10%"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all"
+                required
+              />
+            </div>
+
             {/* Description */}
             <div className="space-y-2">
               <label
@@ -306,6 +329,11 @@ const ProductForm = () => {
               {formData.productImage && (
                 <p className="text-sm text-gray-500 font-bold mt-2">
                   Selected file: {formData.productImage.name}
+                  {/* <img 
+                    src={formData.productImage} 
+                    alt="Current product" 
+                    className="h-20 w-20 object-cover rounded" 
+                  /> */}
                 </p>
               )}
             </div>

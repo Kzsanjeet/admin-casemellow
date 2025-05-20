@@ -21,6 +21,7 @@ interface ProductProps {
       _id: string;
       productName: string;
       productPrice: number;
+      discount:number;
       productDescription: string;
       productImage: string; // Should be string here
       productCategory: string;
@@ -44,6 +45,7 @@ const EditForm: React.FC<ProductProps> = ({ productDetails }) => {
   const [formData, setFormData] = useState({
     productName: productDetails.productName || '',
     productPrice: productDetails.productPrice || 0,
+    discount: productDetails.discount || 0,
     productDescription: productDetails.productDescription || '',
     productCategory: productDetails.productCategory || '',
     brands: productDetails.brands._id || '',
@@ -172,6 +174,7 @@ const EditForm: React.FC<ProductProps> = ({ productDetails }) => {
             Update the product details
           </p>
         </CardHeader>
+
         <CardContent>
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Product Name */}
@@ -214,6 +217,26 @@ const EditForm: React.FC<ProductProps> = ({ productDetails }) => {
               />
             </div>
 
+            {/* discount */}
+            <div className="space-y-2">
+              <label
+                htmlFor="price"
+                className="text-sm font-medium text-gray-700"
+              >
+                Discount (%)
+              </label>
+              <input
+                type="number"
+                id="discount"
+                name="discount"
+                value={formData.discount}
+                onChange={handleInputChange}
+                placeholder="Enter product price"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all"
+                required
+              />
+            </div>
+
             {/* Description */}
             <div className="space-y-2">
               <label
@@ -230,7 +253,7 @@ const EditForm: React.FC<ProductProps> = ({ productDetails }) => {
                 placeholder="Enter product description"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all"
                 rows={4}
-                required
+                // required
               />
             </div>
 
@@ -288,9 +311,16 @@ const EditForm: React.FC<ProductProps> = ({ productDetails }) => {
                 </div>
               )}
               {newImage && (
-                <p className="text-sm text-gray-500 font-semibold mt-2">
+                <div className="text-sm text-gray-500 font-semibold mt-2 flex items-center gap-2">
                   New selected file: {newImage.name}
-                </p>
+                  <button
+                    type="button"
+                    onClick={() => setNewImage(null)}
+                    className="text-red-500 underline"
+                  >
+                    Remove
+                  </button>
+                </div>
               )}
             </div>
 

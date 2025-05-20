@@ -425,10 +425,6 @@ const ProductTable = () => {
                     }
                 }
             )
-            
-            // if (!response.ok) {
-            //     throw new Error('Failed to fetch products')
-            // }
 
             const result = await response.json()
             
@@ -477,9 +473,6 @@ const ProductTable = () => {
     
             if (data.success) {
                 toast.success("Status updated successfully");
-                //router.refresh(); // Refresh UI
-                //setRefresh((prev) => !prev); // Toggle refresh state to trigger re-fetch
-                // Update the local state instead of re-fetching
             setProductDetails((prev) =>
                 prev.map((product) =>
                     product._id === productId ? { ...product, isActive: updatedStatus } : product
@@ -514,17 +507,6 @@ const ProductTable = () => {
         setIsDeleteModalOpen(false);
       };
     
-
-    // if (error) {
-    //     return (
-    //         <div className="p-8 text-center text-red-600">
-    //             <p>Error: {error}</p>
-    //             <Button onClick={fetchProductData} className="mt-4">
-    //                 Retry
-    //             </Button>
-    //         </div>
-    //     )
-    // }
 
     return (
         <div className="p-8 flex w-full bg-gray-100 min-h-screen">
