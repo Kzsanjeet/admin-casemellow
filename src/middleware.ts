@@ -1,65 +1,3 @@
-// import { NextResponse } from "next/server"
-// import type { NextRequest } from "next/server"
-// import { verifyToken } from "./lib/verifyToken"
-
-// // Authentication configuration
-// const AUTH_CONFIG = {
-//   publicPaths: ["/login", "/forgot-password"], // initially authorized path
-//   protectedPaths: [
-//     "/home",
-//     "/brands",
-//     "/products",
-//     "/orders",
-//     "/blogs",
-//     "/activities",
-//     "/plan-trip",
-//     "/requests-mails",
-//     "/users-info",
-//   ],  // path that are applicable only after logged in
-//   loginPath: "/login",
-//   homePath: "/home",
-// }
-
-// export async function middleware(request: NextRequest) {
-//   // Get token from cookies
-//   const token = request.cookies.get("accessToken")?.value
-
-//   const pathname = new URL(request.url).pathname
-
-
-
-//   // Helper function to check path matching
-//   const matchesPath = (paths: string[]) =>
-//     paths.some((path) => pathname.startsWith(path))
-//   // Scenario 1: No token - redirect to login for protected routes
-//   if (!token) {
-//     if (matchesPath(AUTH_CONFIG.protectedPaths)) {
-//       return NextResponse.redirect(new URL(AUTH_CONFIG.loginPath, request.url))
-//     }
-//     return NextResponse.next()
-//   }
-
-// }
-
-// // Matcher configuration
-// export const config = {
-//   matcher: [
-//     "/home/:path*",
-//     "/brands/:path*",
-//     "/products/:path*",
-//     "/wellness/:path*",
-//     "/blogs/:path*",
-//     "/activities/:path*",
-//     "/plan-trip/:path*",
-//     "/requests-mails/:path*",
-//     "/users-info/:path*",
-//     "/login", // Include login in matcher
-//     "/forgot-password", // Include forgot-password in matcher
-//   ],
-// }
-
-
-
 // middleware.ts
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
@@ -72,6 +10,7 @@ export async function middleware(request: NextRequest) {
   })
 
   // Define routes protected by role
+  // user to be authenticated before they can access them.
   const protectedRoutes = [
     "/home",
     "/brands",
@@ -79,8 +18,6 @@ export async function middleware(request: NextRequest) {
     "/orders",
     "/customize",
     "/customize/orders",
-    // "/plan-trip",
-    // "/requests-mails",
     "/users-info",
   ]
 
@@ -136,6 +73,8 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next()
 }
 
+
+//tells Next.js which routes the middleware should run on.
 export const config = {
   matcher: [
     "/home/:path*",
@@ -143,9 +82,6 @@ export const config = {
     "/products/:path*",
     "/orders/:path*",
     "/customize/:path*",
-    // "/activities/:path*",
-    // "/plan-trip/:path*",
-    // "/requests-mails/:path*",
     "/users-info/:path*",
     "/login", // Include login in matcher
     "/forgot-password", // Include forgot-password in matcher

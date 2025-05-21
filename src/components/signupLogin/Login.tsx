@@ -52,7 +52,7 @@ const Login = () => {
                 identifier:email,
                 password,
                 redirect:false,
-                callbackUrl:"/home"
+                callbackUrl:"/home"  //the URL you want to redirect the user to upon successful login.
             })
             // console.log("result",result)
             if (result?.error) {

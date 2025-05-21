@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableFooter,
   TableHead,
@@ -18,9 +17,6 @@ import { useRouter } from "next/navigation";
 import Loader from "../loading/loader";
 import {
   Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
@@ -51,20 +47,6 @@ const BrandTable = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
 
-
- 
-
-  // const handleOpenDeleteModal = (brandId: string) => {
-  //   setSelectedBrandId(brandId);
-  //   setIsDeleteModalOpen(true);
-  // };
-
-
-
-  // const handleDeleteSuccess = () => {
-  //   // Refresh your brand list here
-  //   console.log("Brand deleted successfully!");
-  // };
   
   const fetchBrand = async () => {
     try {
@@ -108,25 +90,6 @@ const BrandTable = () => {
     setIsDeleteModalOpen(false);
   };
 
-  //const handleDeleteFunc = async() =>{
-//     setLoading(true);
-//     try {
-//         const deleteBrand = await fetch(`${process.env.NEXT_PUBLIC_LOCAL_PORT}/brands/delete-brand/${brandDetail}`,{
-//             method: 'DELETE',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 },
-//         })
-//         const response = await deleteBrand.json()
-//         if(deleteBrand){
-//             toast.success("Deleted Successfully");
-//             setIsDelete(true)
-//             // state = false
-//         }
-//     } catch (error) {
-//         console.log(error)
-//     }
-// }// 
 
   useEffect(() => {
     fetchBrand();
@@ -219,14 +182,14 @@ const BrandTable = () => {
                         </TableCell>
                         <TableCell className="text-right">
                             <div className="flex justify-end space-x-1">
-                            <Button
+                            {/* <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={()=>router.push(`/brands/add-model/${brand._id}`)}
                                 className="hover:bg-blue-100 text-blue-600 hover:text-blue-600 p-2 h-8 w-8"
                             >
                                 <Plus className="h-4 w-4" />
-                            </Button>
+                            </Button> */}
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -268,92 +231,6 @@ const BrandTable = () => {
             </div>
             )
           }                     
-            {/* <div>
-            <Table>
-                    <TableHeader className="text-xl">
-                    <TableRow className="bg-gray-50 hover:bg-gray-50">
-                        <TableHead className="font-semibold">Brand Name</TableHead>
-                        <TableHead className="font-semibold">Status</TableHead>
-                        <TableHead className="text-right font-semibold">Actions</TableHead>
-                    </TableRow>
-                    </TableHeader>
-                    <TableBody className="text-xl">
-                    {Array.isArray(brandDetail) && brandDetail.map((brand) => (
-                        <TableRow
-                        key={brand._id}
-                        className="hover:bg-gray-50 transition-colors"
-                        >
-                        <TableCell>
-                            <div className="flex items-center space-x-3">
-                            <div className="h-8 w-8 bg-gray-100 rounded-md flex items-center justify-center">
-                                <Shield className="h-4 w-4 text-gray-500" />
-                            </div>
-                            <span className="font-medium text-gray-700">
-                                {brand.brandName}
-                            </span>
-                            </div>
-                        </TableCell>
-                        <TableCell>
-                            <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                ${
-                                    brand.isActive
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-gray-100 text-gray-800"
-                                }`}
-                            >
-                            {brand.isActive ? "Active" : "Inactive"}
-                            </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                            <div className="flex justify-end space-x-1">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={()=>router.push(`/brands/add-model/${brand._id}`)}
-                                className="hover:bg-blue-100 text-blue-600 hover:text-blue-600 p-2 h-8 w-8"
-                            >
-                                <Plus className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => router.push(`/brands/edit/${brand._id}`)}
-                                className="hover:bg-green-100 text-green-600 hover:text-green-600 p-2 h-8 w-8"
-                            >
-                                <Edit2 className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="hover:bg-red-100 text-red-600 hover:text-red-600 p-2 h-8 w-8"
-                                onClick={()=>handleDelete(brand._id)}
-                            >
-                                <Trash2 className="h-4 w-4" />
-                            </Button>
-                            </div>
-                        </TableCell>
-                        </TableRow>
-                    ))}
-                    </TableBody>
-                    <TableFooter>
-                    <TableRow className="bg-gray-50 hover:bg-gray-50">
-                        <TableCell colSpan={2}>Total Brands</TableCell>
-                        <TableCell colSpan={2} className="text-right font-bold">
-                        {brandDetail.length} Brands
-                        </TableCell>
-                    </TableRow>
-                    </TableFooter>
-            </Table>
-            {isDelete && selectedBrandId ? (
-              <DeleteForm  
-              onClose={handleCloseDeleteModal}
-              brandId={selectedBrandId}
-              onDeleteSuccess={setIsDeleted} 
-              />
-            ) : null}
-
-            </div> */}
 
           {/* Pagination */}
           <Pagination>

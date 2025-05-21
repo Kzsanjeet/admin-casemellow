@@ -1,9 +1,9 @@
 import NextAuth, { User } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
-import GoogleProvider from "next-auth/providers/google"
+// import GoogleProvider from "next-auth/providers/google"
 import axios from "axios"
 import { JWT } from "next-auth/jwt"
-import { Provider } from "@/provider/Providers"
+// import { Provider } from "@/provider/Providers"
 
 interface AuthResponse {
   data: {

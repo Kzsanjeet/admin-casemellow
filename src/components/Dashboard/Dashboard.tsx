@@ -160,7 +160,8 @@ useEffect(()=>{
       </div>
 
       {/* Recent Activity Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="flex flex-col justify-center items-center">
+        <div className="w-full gap-6">
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Recent Orders</CardTitle>
@@ -212,43 +213,7 @@ useEffect(()=>{
           </div>
           </CardContent>
         </Card>
-
-        {/* <Card>
-          <CardHeader>
-            <CardTitle>Top Products</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-full bg-red-100 flex items-center justify-center">
-                  <Package className="h-5 w-5 text-red-500" />
-                </div>
-                <div>
-                  <div className="font-medium">Product A</div>
-                  <div className="text-sm text-muted-foreground">42 sales</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center">
-                  <Package className="h-5 w-5 text-blue-500" />
-                </div>
-                <div>
-                  <div className="font-medium">Product B</div>
-                  <div className="text-sm text-muted-foreground">38 sales</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-full bg-green-100 flex items-center justify-center">
-                  <Package className="h-5 w-5 text-green-500" />
-                </div>
-                <div>
-                  <div className="font-medium">Product C</div>
-                  <div className="text-sm text-muted-foreground">27 sales</div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card> */}
+      </div>
       </div>
     </div>    
     </div>

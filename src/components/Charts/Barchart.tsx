@@ -1,7 +1,6 @@
 "use client"
 
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import {
   Card,
   CardContent,
@@ -9,23 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart"
-
-const chartConfig = {
-  desktop: {
-    label: "Normal Orders",
-    color: "hsl(var(--chart-1))",
-  },
-  mobile: {
-    label: "Customized Orders",
-    color: "hsl(var(--chart-2))",
-  },
-} satisfies ChartConfig
 
 interface ChartEntry {
   month: string;
@@ -37,7 +19,7 @@ interface ChartProps {
   data: ChartEntry[];
 }
 
-const PieChart: React.FC<ChartProps> = ({ data }) => {
+const AreaChartComponent: React.FC<ChartProps> = ({ data }) => {
   return (
     <Card>
       <CardHeader>
@@ -47,47 +29,52 @@ const PieChart: React.FC<ChartProps> = ({ data }) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <AreaChart
-            data={data}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="dot" />}
-            />
-           <Area
-              dataKey="normalOrders"
-              type="natural"
-              fill="hsl(var(--chart-1))"
-              fillOpacity={0.4}
-              stroke="hsl(var(--chart-1))"
-              stackId="a"
-            />
-           <Area
-              dataKey="customizedOrders"
-              type="natural"
-              fill="hsl(var(--chart-2))"
-              fillOpacity={0.4}
-              stroke="hsl(var(--chart-2))"
-              stackId="a"
-            />
-          </AreaChart>
-        </ChartContainer>
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={data}
+              margin={{
+                top: 20,
+                right: 30,
+                left: 0,
+                bottom: 0,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="month" 
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => value.slice(0, 3)}
+              />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Area
+                type="monotone"
+                dataKey="normalOrders"
+                name="Normal Orders"
+                stackId="1"
+                stroke="#10b981"
+                fill="#10b981"
+                fillOpacity={0.4}
+              />
+              <Area
+                type="monotone"
+                dataKey="customizedOrders"
+                name="Customized Orders"
+                stackId="1"
+                stroke="#8b5cf6"
+                fill="#8b5cf6"
+                fillOpacity={0.4}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   )
 }
 
-export default PieChart
+export default AreaChartComponent
